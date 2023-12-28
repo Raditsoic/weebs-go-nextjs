@@ -1,0 +1,46 @@
+type Anime {
+  id: ID!
+  title: String!
+  image: String!
+  description: String!
+  genre: Genre!
+}
+
+type Manga {
+  id: ID!
+  title: String!
+  image: String!
+  description: String!
+  genre: Genre!  
+}
+
+type Genre {
+  id: ID!
+  name: String!
+}
+
+type Query {
+  animes: [Anime!]!
+  mangas: [Manga!]!
+  oneAnime(id: ID!): Anime!
+  oneManga(id: ID!): Manga!
+}
+
+input NewAnime {
+  title: String!
+  image: String!
+  description: String!
+  genreId: ID!
+}
+
+input NewManga {
+  title: String!
+  image: String!
+  description: String!
+  genreId: ID!
+}
+
+type Mutation {
+  createAnime(input: NewAnime!): Anime!
+  createManga(input: NewManga!): Manga!
+}
