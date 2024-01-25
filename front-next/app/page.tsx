@@ -1,10 +1,31 @@
-import Image from 'next/image'
+"use client"
 import Link from 'next/link'
 import animeList, { mangaList } from '@/utils/storage/data'
-import { Anime } from '@/types/anime'
-import { Manga } from '@/types/manga'
+import { Mangas } from '@/types/mangas'
+import { Animes } from "@/types/animes";
+import { getAnimes } from "@/utils/client/apollo-client";
+import { getMangas } from '@/utils/client/apollo-client';
+import { useEffect, useState } from "react"
 
 function AnimeCard() {
+  const [animes, setAnimes] = useState<Animes | undefined>(undefined);
+  useEffect(() => {
+    const fetchedAnime = async () => {
+      try {
+        const response = await getAnimes();
+        setAnimes(response);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchedAnime();
+  }, []);
+
+  if (animes === undefined) {
+    return <div>Loading...</div>; 
+  }
+
   return (
     <div>
       <div className="flex justify-center items-center p-3">
@@ -13,7 +34,7 @@ function AnimeCard() {
       <div className='p-5'>
         <div className="flex flex-col">
           <div className="grid lg:grid-cols-2 grid-cols-1 gap-8 items-center justify-center">
-          {animeList.map((anime: Anime) => (
+          {animes.map((anime) => (
             <div className={`container max-w-s justify-self-auto flex flex-col h-full`} key={anime.id}>
               <Link href="#" className="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 h-full">
                 <img className="object-cover md:h-64 rounded-t-lg" src={anime.image} alt={anime.title} />
@@ -34,6 +55,24 @@ function AnimeCard() {
 }
 
 function MangaCard() {
+  const [mangas, setMangas] = useState<Mangas | undefined>(undefined);
+  useEffect(() => {
+    const fetchedManga = async () => {
+      try {
+        const response = await getMangas();
+        setMangas(response);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchedManga();
+  }, []);
+
+  if (mangas === undefined) {
+    return <div>Loading...</div>; 
+  }
+
   return (
     <div>
       <div className="flex justify-center items-center p-3">
@@ -42,10 +81,10 @@ function MangaCard() {
       <div className='p-5'>
       <div className="flex flex-col">
         <div className="grid lg:grid-cols-2 grid-cols-1 gap-8 items-center justify-center">
-        {mangaList.map((manga: Manga) => (
+        {mangas.map((manga) => (
           <div className={`container max-w-s justify-self-auto flex flex-col h-full`} key={manga.id}>
             <Link href="#" className="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 h-full">
-              <img className="object-cover md:h-64 rounded-t-lg" src={manga.image} alt={manga.title} />
+            <img className="object-cover md:h-64 rounded-t-lg" src={manga.image} alt={manga.title} />
               <div className="flex flex-col justify-between p-4 leading-normal w-full">
                   <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{manga.title}</h5>
                   <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
