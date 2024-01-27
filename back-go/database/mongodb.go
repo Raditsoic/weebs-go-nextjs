@@ -74,6 +74,10 @@ func (db *AnimeDB) GetByID(id string) (interface{}, error) {
 	filter := bson.M{"_id": _id}
 	var anime model.Anime
 	err := col.FindOne(ctx, filter).Decode(&anime)
+	if err == mongo.ErrNoDocuments {
+		return nil, nil 
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -91,6 +95,10 @@ func (db *MangaDB) GetByID(id string) (interface{}, error) {
 	filter := bson.M{"_id": _id}
 	var manga model.Manga
 	err := col.FindOne(ctx, filter).Decode(&manga)
+	if err == mongo.ErrNoDocuments {
+		return nil, nil
+	}
+
 	if err != nil {
 		return nil, err
 	}

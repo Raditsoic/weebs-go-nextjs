@@ -1,6 +1,8 @@
+"use client"
 import Link from 'next/link'
-import animeList from '@/utils/storage/data'
-import { Anime } from '@/types/anime'
+import { useEffect, useState } from "react"
+import { Animes } from "@/types/animes";
+import { getAnimes } from "@/utils/client/apollo-client";
 
 function SearchBar() {
     return (
@@ -20,11 +22,29 @@ function SearchBar() {
   }
   
 export default function AnimePage() {
+  const [animes, setAnimes] = useState<Animes | undefined>(undefined);
+  useEffect(() => {
+    const fetchedAnime = async () => {
+      try {
+        const response = await getAnimes();
+        setAnimes(response);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchedAnime();
+  }, []);
+
+  if (animes === undefined) {
+    return <div>Loading...</div>; 
+  }
+
     return (
         <div>
             <SearchBar />
             <div className="grid lg:grid-cols-4 grid-cols-2 gap-8 grid-flow-row-dense p-5 justify-items-center">
-                {animeList.map((anime: Anime) => (
+                {animes.map((anime) => (
                     <div className={`container max-w-s justify-self-auto flex flex-col h-full ${anime.title === 'Spirited Away' ? 'lg:col-span-2' : ''}`} key={anime.id}>
                         <Link href="#" className="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 h-full">
                             <img className="object-cover md:h-64 rounded-t-lg" src={anime.image} alt={anime.title} />

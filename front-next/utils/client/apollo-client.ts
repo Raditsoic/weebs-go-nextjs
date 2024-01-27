@@ -58,10 +58,10 @@ export const getMangas = async (): Promise<Mangas> => {
   }
 }
 
-export const getAnime = async (): Promise<Anime> => {
+export const getAnime = async (id: string): Promise<Anime | undefined> => {
   const query = gql`
-  query {
-    oneAnime(id: "8414431888851029825") {
+  query{
+    oneAnime(id: "${id}") {
       id
       title
       image
@@ -70,18 +70,17 @@ export const getAnime = async (): Promise<Anime> => {
   }`
 
   try {
-    const { anime }: { anime: Anime } = await graphQLClient.request(query);
-    return anime
+    const { oneAnime }: { oneAnime: Anime } = await graphQLClient.request(query);
+    return oneAnime
   } catch(err) {
-    console.error(err)
-    throw err
+    return undefined
   }
 }
 
-export const getManga = async (): Promise<Manga> => {
+export const getManga = async (id: string): Promise<Manga | undefined> => {
   const query = gql`
   query {
-    oneManga(id: "1214583687922155472") {
+    oneManga(id: "${id}") {
       id
       title
       image
@@ -90,10 +89,9 @@ export const getManga = async (): Promise<Manga> => {
   }`
 
   try {
-    const { manga }: { manga: Manga } = await graphQLClient.request(query);
-    return manga
+    const { oneManga }: { oneManga: Manga } = await graphQLClient.request(query);
+    return oneManga
   } catch(err) {
-    console.error(err)
-    throw err
+    return undefined
   }
 }
