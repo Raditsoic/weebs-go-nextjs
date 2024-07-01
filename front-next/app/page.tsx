@@ -1,10 +1,7 @@
 "use client"
 import Link from 'next/link'
-import animeList, { mangaList } from '@/utils/storage/data'
-import { Mangas } from '@/types/mangas'
-import { Animes } from "@/types/animes";
-import { getAnimes } from "@/utils/client/apollo-client";
-import { getMangas } from '@/utils/client/apollo-client';
+import { Mangas, Animes } from '@/utils/types/api'
+import { getAnimes, getMangas } from "@/utils/client/apollo-client";
 import { useEffect, useState } from "react"
 
 function AnimeCard() {
@@ -104,13 +101,17 @@ function MangaCard() {
 export default function Home() {
   return (
     <main>
-      <div className="flex p-6">
-        <p className='text-4xl font-bold'>Welcome to Weebs<br></br>Collections of Anime and Manga</p>
+      <div className="flex flex-col p-10 my-2 mx-2">
+        <p className='text-2xl font-semibold'>Welcome Home!</p>
+        <p className='text-l font-normal mt-2'>
+         
+        </p>
       </div>
       <div className="grid grid-cols-2 p-6 justify-center divide-x divide-gray-700">
-          <AnimeCard></AnimeCard>
-          <MangaCard></MangaCard>
+          <AnimeCard />
+          <MangaCard />
       </div>
     </main>
   )
 }
+

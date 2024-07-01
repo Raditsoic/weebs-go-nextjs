@@ -1,23 +1,32 @@
 "use client"
 import Link from 'next/link'
 import { useEffect, useState } from "react"
-import { Animes } from "@/types/animes";
+import { Animes } from "@/utils/types/api";
 import { getAnimes } from "@/utils/client/apollo-client";
 
 function SearchBar() {
     return (
-      <form className="flex w-full items-center justify-center p-4"> {/* Set a fixed width for the form */}
-        <div className="text-center">
-        <label className="block text-xl font-medium leading-6 text-white ">Search Anime</label>
-        <div className="relative mt-2 rounded-md shadow-sm">
-          <input
-            type="text"
-            className="block w-64 h-10 rounded-md border-0 py-1.5 pl-3 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            placeholder="Attack on Titan...?"
-          />
+      <div className="grid grid-cols-2 gap-8 w-full">
+        {/* Anime description */}
+        <div className='flex flex-col p-10'>
+          <p className='text-2xl font-semibold'>Anime</p>
+          <p className='text-l font-normal mt-2'>
+          is hand-drawn and computer-generated animation originating from Japan. 
+          Outside Japan and in English, anime refers specifically to animation produced in Japan. 
+          However, in Japan and Japanese, anime describes all animated works, regardless of style or origin. 
+          </p>
         </div>
-      </div>
+        <form className="flex w-full items-center justify-center">
+          {/* Search input */}
+          <div className="flex flex-col w-3/4">
+            <input
+              type="text"
+              className="block w-full rounded-md mt-4 border-0 py-2 pl-3 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              placeholder="Search Anime"
+            />
+          </div>
       </form>
+    </div>
     );
   }
   

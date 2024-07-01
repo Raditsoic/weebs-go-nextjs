@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
-import { Manga } from "@/types/manga";
+import { Manga } from "@/utils/types/api";
 import { getManga } from "@/utils/client/apollo-client";
 
 export default function DedicatedManga({ params }: { params: { mangapage: any; slug:string 

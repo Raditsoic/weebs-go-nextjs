@@ -1,7 +1,7 @@
 "use client"
 import { getMangas } from '@/utils/client/apollo-client';
 import { useEffect, useState } from "react";
-import { Mangas } from '@/types/mangas';
+import { Mangas } from '@/utils/types/api';
 import Link from 'next/link'
 
 export default function Manga() {

@@ -113,7 +113,7 @@ export default function RootLayout({
             </div>
             <div className='flex flex-col items-center justify-center p-3'>
               <div>
-                <p className='text-3xl font-extrabold'>Created by raditsoic</p>
+                <p className='text-m font-bold'>by raditsoic</p>
               </div>
             </div>
             <Links></Links>

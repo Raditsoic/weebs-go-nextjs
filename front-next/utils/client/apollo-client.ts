@@ -1,8 +1,5 @@
 import { GraphQLClient, gql } from "graphql-request";
-import { Animes } from "@/types/animes";
-import { Mangas } from "@/types/mangas";
-import { Anime } from "@/types/anime";
-import { Manga } from "@/types/manga";
+import { Animes, Mangas, Anime, Manga } from "../types/api";
 
 const endpoint = 'http://localhost:8080/query'
 
