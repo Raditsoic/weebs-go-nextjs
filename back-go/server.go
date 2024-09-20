@@ -7,7 +7,9 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/Raditsoic/anime-go/database"
 	"github.com/Raditsoic/anime-go/graph"
+	"github.com/Raditsoic/anime-go/service"
 	"github.com/rs/cors"
 )
 
@@ -19,7 +21,18 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	animeRepo := database.NewAnimeRepo(database.Connect())
+	mangaRepo := database.NewMangaRepo(database.Connect())
+
+	animeService := service.NewAnimeService(*animeRepo)
+	mangaService := service.NewMangaService(*mangaRepo)
+
+	resolver := &graph.Resolver{
+		AnimeService: animeService,
+		MangaService: mangaService,
+	}
+
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))
 
 	corsMiddleware := cors.Default()
 

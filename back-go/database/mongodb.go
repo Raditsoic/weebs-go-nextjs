@@ -22,33 +22,33 @@ const timeoutSeconds = 30
 type AnimeList []*model.Anime
 type MangaList []*model.Manga
 
-type DBInterface interface {
+type RepoInterface interface {
 	GetByID(id string) (interface{}, error)
 	GetAll() ([]interface{}, error)
 	Create()
 }
 
-// AnimeDB represents the database operations for anime.
-type AnimeDB struct {
+// AnimeRepo represents the database operations for anime.
+type AnimeRepo struct {
 	client *mongo.Client
 }
 
-// MangaDB represents the database operations for manga.
-type MangaDB struct {
+// MangaRepo represents the database operations for manga.
+type MangaRepo struct {
 	client *mongo.Client
 }
 
-// NewAnimeDB creates a new AnimeDB instance.
-func NewAnimeDB(client *mongo.Client) *AnimeDB {
-	return &AnimeDB{client: client}
+// NewAnimeRepo creates a new AnimeRepo instance.
+func NewAnimeRepo(client *mongo.Client) *AnimeRepo {
+	return &AnimeRepo{client: client}
 }
 
-// NewMangaDB creates a new MangaDB instance.
-func NewMangaDB(client *mongo.Client) *MangaDB {
-	return &MangaDB{client: client}
+// NewMangaRepo creates a new MangaRepo instance.
+func NewMangaRepo(client *mongo.Client) *MangaRepo {
+	return &MangaRepo{client: client}
 }
 
-// Connect establishes a connection to the MongoDB database.
+// Connect establishes a connection to the MongoRepo database.
 func Connect() *mongo.Client {
 	clientOptions := options.Client().ApplyURI(connectionString)
 	clientOptions = clientOptions.SetMaxPoolSize(maxPoolSize)
@@ -65,7 +65,7 @@ func Connect() *mongo.Client {
 }
 
 // GetByID retrieves a record from the database based on the provided ID.
-func (db *AnimeDB) GetByID(id string) (interface{}, error) {
+func (db *AnimeRepo) GetByID(id string) (interface{}, error) {
 	col := db.client.Database(databaseName).Collection(animeCollection)
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSeconds*time.Second)
 	defer cancel()
@@ -86,7 +86,7 @@ func (db *AnimeDB) GetByID(id string) (interface{}, error) {
 }
 
 // GetByID retrieves a record from the database based on the provided ID.
-func (db *MangaDB) GetByID(id string) (interface{}, error) {
+func (db *MangaRepo) GetByID(id string) (interface{}, error) {
 	col := db.client.Database(databaseName).Collection(mangaCollection)
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSeconds*time.Second)
 	defer cancel()
@@ -107,7 +107,7 @@ func (db *MangaDB) GetByID(id string) (interface{}, error) {
 }
 
 // GetAll retrieves all records from the database.
-func (db *AnimeDB) GetAll() ([]interface{}, error) {
+func (db *AnimeRepo) GetAll() ([]interface{}, error) {
 	col := db.client.Database(databaseName).Collection(animeCollection)
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSeconds*time.Second)
 	defer cancel()
@@ -131,7 +131,7 @@ func (db *AnimeDB) GetAll() ([]interface{}, error) {
 }
 
 // GetAll retrieves all records from the database.
-func (db *MangaDB) GetAll() ([]interface{}, error) {
+func (db *MangaRepo) GetAll() ([]interface{}, error) {
 	col := db.client.Database(databaseName).Collection(mangaCollection)
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSeconds*time.Second)
 	defer cancel()
@@ -154,20 +154,22 @@ func (db *MangaDB) GetAll() ([]interface{}, error) {
 	return result, nil
 }
 
-func (db *AnimeDB) Create(anime *model.Anime) {
+func (db *AnimeRepo) Create(anime *model.Anime) error {
 	animeCol := db.client.Database(databaseName).Collection(animeCollection)
 	_, err := animeCol.InsertOne(context.TODO(), anime)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }
 
-func (db *MangaDB) Create(manga *model.Manga) {
+func (db *MangaRepo) Create(manga *model.Manga) error {
 	mangaCol := db.client.Database(databaseName).Collection(mangaCollection)
 	_, err := mangaCol.InsertOne(context.TODO(), manga)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }
 
 
