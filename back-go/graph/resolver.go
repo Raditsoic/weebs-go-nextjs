@@ -7,4 +7,5 @@ import "github.com/Raditsoic/anime-go/service"
 type Resolver struct{
 	AnimeService *service.AnimeService
 	MangaService *service.MangaService
+	UserService *service.UserService
 }

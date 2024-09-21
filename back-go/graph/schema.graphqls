@@ -14,16 +14,23 @@ type Manga {
   genre: Genre!  
 }
 
+type User {
+  id: ID! 
+  username: String!
+  email: String!
+  salt: String!
+  hash: String!
+  role: String!
+}
+
 type Genre {
   id: ID!
   name: String!
 }
 
-type Query {
-  animes: [Anime!]!
-  mangas: [Manga!]!
-  oneAnime(id: ID!): Anime!
-  oneManga(id: ID!): Manga!
+type AuthPayload {
+  token: String!
+  user: User!
 }
 
 input NewAnime {
@@ -40,7 +47,27 @@ input NewManga {
   genreId: ID!
 }
 
+input RegisterUser {
+  email: String!
+  username: String!
+  password: String!
+}
+
+input LoginUser {
+  username: String!
+  password: String!
+}
+
+type Query {
+  animes: [Anime!]!
+  mangas: [Manga!]!
+  oneAnime(id: ID!): Anime!
+  oneManga(id: ID!): Manga!
+}
+
 type Mutation {
   createAnime(input: NewAnime!): Anime!
   createManga(input: NewManga!): Manga!
+  register(input: RegisterUser!): AuthPayload!
+  login(input: LoginUser!): AuthPayload!
 }

@@ -18,7 +18,7 @@ func NewAnimeService(repo database.AnimeRepo) *AnimeService {
 
 func (s *AnimeService) CreateAnime(input model.NewAnime) (*model.Anime, error) {
 	anime := &model.Anime{
-		ID:          fmt.Sprint(utils.GenerateUniqueID()),
+		ID:          fmt.Sprint(utils.GenerateUUID()),
 		Title:       input.Title,
 		Image:       input.Image,
 		Description: input.Description,

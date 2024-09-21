@@ -18,7 +18,7 @@ func NewMangaService(repo database.MangaRepo) *MangaService {
 
 func (s *MangaService) CreateManga(input model.NewManga) (*model.Manga, error) {
 	manga := &model.Manga{
-		ID:          fmt.Sprint(utils.GenerateUniqueID()),
+		ID:          fmt.Sprint(utils.GenerateUUID()),
 		Title:       input.Title,
 		Image:       input.Image,
 		Description: input.Description,
