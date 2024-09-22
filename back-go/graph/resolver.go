@@ -8,4 +8,5 @@ type Resolver struct{
 	AnimeService *service.AnimeService
 	MangaService *service.MangaService
 	UserService *service.UserService
+	ReviewService *service.ReviewService
 }

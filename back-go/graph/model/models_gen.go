@@ -50,6 +50,13 @@ type NewManga struct {
 	GenreID     string `json:"genreId"`
 }
 
+type NewReview struct {
+	ContentID   *string `json:"contentID,omitempty"`
+	ContentType string  `json:"contentType"`
+	Comment     string  `json:"comment"`
+	Rating      float64 `json:"rating"`
+}
+
 type Query struct {
 }
 
@@ -57,6 +64,16 @@ type RegisterUser struct {
 	Email    string `json:"email"`
 	Username string `json:"username"`
 	Password string `json:"password"`
+}
+
+type Review struct {
+	ID          string  `json:"id"`
+	UserID      string  `json:"userID"`
+	ContentID   string  `json:"contentID"`
+	ContentType string  `json:"contentType"`
+	Rating      float64 `json:"rating"`
+	Comment     string  `json:"comment"`
+	CreatedAt   string  `json:"createdAt"`
 }
 
 type User struct {

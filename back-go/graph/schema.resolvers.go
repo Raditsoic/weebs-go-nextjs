@@ -61,6 +61,23 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginUser) (*m
 	return r.UserService.Login(input)
 }
 
+// SaveReview is the resolver for the saveReview field.
+func (r *mutationResolver) SaveReview(ctx context.Context, input model.NewReview) (*model.Review, error) {
+	claims := ctx.Value(middleware.UserContextKey)
+	if claims == nil {
+		return nil, fmt.Errorf("Unauthorized.")
+	}
+
+	userClaims, ok := claims.(*utils.Claims)
+	if !ok {
+		return nil, fmt.Errorf("Invalid token.")
+	}
+
+	userID := userClaims.ID
+
+	return r.ReviewService.SaveReview(input, userID)
+}
+
 // Animes is the resolver for the animes field.
 func (r *queryResolver) Animes(ctx context.Context) ([]*model.Anime, error) {
 	claims := ctx.Value(middleware.UserContextKey)
@@ -109,3 +126,27 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *mutationResolver) CreateReview(ctx context.Context, input model.NewReview) (*model.Review, error) {
+	claims := ctx.Value(middleware.UserContextKey)
+	if claims == nil {
+		return nil, fmt.Errorf("Unauthorized.")
+	}
+
+	userClaims, ok := claims.(*utils.Claims)
+	if !ok {
+		return nil, fmt.Errorf("Invalid token.")
+	}
+
+	userID := userClaims.ID
+
+	return r.ReviewService.CreateReview(input, userID)
+}
+*/

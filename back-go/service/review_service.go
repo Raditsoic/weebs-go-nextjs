@@ -1,0 +1,55 @@
+package service
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/Raditsoic/anime-go/database"
+	"github.com/Raditsoic/anime-go/graph/model"
+	"github.com/Raditsoic/anime-go/utils"
+)
+
+type ReviewService struct {
+	ReviewRepo database.ReviewRepo
+}
+
+func NewReviewService(repo database.ReviewRepo) *ReviewService {
+	return &ReviewService{ReviewRepo: repo}
+}
+
+func (s *ReviewService) SaveReview(input model.NewReview, userID string) (*model.Review, error) {
+	var review *model.Review
+	var err error
+
+	if input.ContentID == nil {
+		review = &model.Review{
+			ID:          "review_" + utils.GenerateUUID(), 
+			UserID:      userID,
+			ContentID:   *input.ContentID,
+			ContentType: input.ContentType,
+			Rating:      input.Rating,
+			Comment:     input.Comment,
+			CreatedAt:   time.Now().Format(time.RFC3339), 
+		}
+
+		err = s.ReviewRepo.Create(review)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		review, err = s.ReviewRepo.GetReviewByID(*input.ContentID) 
+		if err != nil {
+			return nil, err
+		}
+
+		review.Comment = input.Comment
+		review.Rating = input.Rating
+
+		err = s.ReviewRepo.UpdateReview(review)
+		if err != nil {
+			return nil, fmt.Errorf("failed to update review: %v", err)
+		}
+	}
+
+	return review, nil
+}

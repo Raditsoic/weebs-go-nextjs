@@ -28,6 +28,16 @@ type Genre {
   name: String!
 }
 
+type Review {
+  id: ID!
+  userID: ID!
+  contentID: ID!
+  contentType: String!
+  rating: Float!
+  comment: String!
+  createdAt: String!
+}
+
 type AuthPayload {
   token: String!
   user: User!
@@ -58,6 +68,13 @@ input LoginUser {
   password: String!
 }
 
+input NewReview {
+  contentID: ID
+  contentType: String!
+  comment: String!
+  rating: Float!
+}
+
 type Query {
   animes: [Anime!]!
   mangas: [Manga!]!
@@ -70,4 +87,5 @@ type Mutation {
   createManga(input: NewManga!): Manga!
   register(input: RegisterUser!): AuthPayload!
   login(input: LoginUser!): AuthPayload!
-}
+  saveReview(input: NewReview!): Review!
+} 
