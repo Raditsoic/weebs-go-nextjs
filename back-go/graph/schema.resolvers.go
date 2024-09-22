@@ -6,17 +6,48 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Raditsoic/anime-go/graph/model"
+	"github.com/Raditsoic/anime-go/middleware"
+	"github.com/Raditsoic/anime-go/utils"
 )
 
 // CreateAnime is the resolver for the createAnime field.
 func (r *mutationResolver) CreateAnime(ctx context.Context, input model.NewAnime) (*model.Anime, error) {
+	claims := ctx.Value(middleware.UserContextKey)
+	if claims == nil {
+		return nil, fmt.Errorf("Unauthorized.")
+	}
+
+	userClaims, ok := claims.(*utils.Claims)
+	if !ok {
+		return nil, fmt.Errorf("Invalid token.")
+	}
+
+	if userClaims.Role != "admin" {
+		return nil, fmt.Errorf("Unauthorized: Only admins can create mangas.")
+	}
+
 	return r.AnimeService.CreateAnime(input)
 }
 
 // CreateManga is the resolver for the createManga field.
 func (r *mutationResolver) CreateManga(ctx context.Context, input model.NewManga) (*model.Manga, error) {
+	claims := ctx.Value(middleware.UserContextKey)
+	if claims == nil {
+		return nil, fmt.Errorf("Unauthorized.")
+	}
+
+	userClaims, ok := claims.(*utils.Claims)
+	if !ok {
+		return nil, fmt.Errorf("Invalid token.")
+	}
+
+	if userClaims.Role != "admin" {
+		return nil, fmt.Errorf("Unauthorized: Only admins can create mangas.")
+	}
+
 	return r.MangaService.CreateManga(input)
 }
 
@@ -32,21 +63,41 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginUser) (*m
 
 // Animes is the resolver for the animes field.
 func (r *queryResolver) Animes(ctx context.Context) ([]*model.Anime, error) {
+	claims := ctx.Value(middleware.UserContextKey)
+	if claims == nil {
+		return nil, fmt.Errorf("Unauthorized")
+	}
+
 	return r.AnimeService.GetAnimes()
 }
 
 // Mangas is the resolver for the mangas field.
 func (r *queryResolver) Mangas(ctx context.Context) ([]*model.Manga, error) {
+	claims := ctx.Value(middleware.UserContextKey)
+	if claims == nil {
+		return nil, fmt.Errorf("Unauthorized")
+	}
+
 	return r.MangaService.GetMangas()
 }
 
 // OneAnime is the resolver for the oneAnime field.
 func (r *queryResolver) OneAnime(ctx context.Context, id string) (*model.Anime, error) {
+	claims := ctx.Value(middleware.UserContextKey)
+	if claims == nil {
+		return nil, fmt.Errorf("Unauthorized")
+	}
+
 	return r.AnimeService.GetAnimeByID(id)
 }
 
 // OneManga is the resolver for the oneManga field.
 func (r *queryResolver) OneManga(ctx context.Context, id string) (*model.Manga, error) {
+	claims := ctx.Value(middleware.UserContextKey)
+	if claims == nil {
+		return nil, fmt.Errorf("Unauthorized")
+	}
+
 	return r.MangaService.GetMangaByID(id)
 }
 

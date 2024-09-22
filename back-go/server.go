@@ -9,6 +9,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/Raditsoic/anime-go/database"
 	"github.com/Raditsoic/anime-go/graph"
+	"github.com/Raditsoic/anime-go/middleware"
 	"github.com/Raditsoic/anime-go/service"
 	"github.com/rs/cors"
 )
@@ -42,7 +43,7 @@ func main() {
 	router := http.NewServeMux()
 
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	router.Handle("/query", srv)
+	router.Handle("/query", middleware.AuthMiddleware(srv))
 
 	handlerWithCors := corsMiddleware.Handler(router)
 

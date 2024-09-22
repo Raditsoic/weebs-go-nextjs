@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -10,27 +11,29 @@ import (
 var jwtSecret []byte
 
 func init() {
-    secret := os.Getenv("JWT_SECRET")
-    if secret == "" {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
 		secret = "YOU_MIGHT_WANT_TO_IMPLEMENT_THIS_BRO"
-    }
-    jwtSecret = []byte(secret)
+	}
+	jwtSecret = []byte(secret)
 }
 
 type Claims struct {
 	ID string `json:"id"`
+	Role string `json:"role"`
 	jwt.RegisteredClaims
 }
 
-func GenerateJWT(id string) (string, error) {
+func GenerateJWT(id string, role string) (string, error) {
 	expirationTime := time.Now().Add(1 * time.Hour)
 
-	claims := &Claims {
+	claims := &Claims{
 		ID: id,
+		Role: role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
-			IssuedAt: jwt.NewNumericDate(time.Now()),
-			Subject: "user_id",
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			Subject:   "user_id",
 		},
 	}
 
@@ -42,4 +45,18 @@ func GenerateJWT(id string) (string, error) {
 	return tokenString, nil
 }
 
+func VerifyToken(token string) (*Claims, error) {
+	parsedToken, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return jwtSecret, nil
+	})
 
+	if err != nil {
+		return nil, fmt.Errorf("Invalid token: %v", err)
+	}
+
+	if claims, ok := parsedToken.Claims.(*Claims); ok && parsedToken.Valid {
+		return claims, nil
+	}
+
+	return nil, fmt.Errorf("Invalid token.")
+}

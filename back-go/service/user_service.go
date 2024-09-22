@@ -56,7 +56,7 @@ func (s *UserService) Register(input model.RegisterUser) (*model.AuthPayload, er
 		return nil, err
 	}
 
-	token, err := utils.GenerateJWT(user.ID)
+	token, err := utils.GenerateJWT(user.ID, user.Role)
 	if err != nil {
 		return nil, err
 	}
@@ -78,10 +78,10 @@ func (s *UserService) Login(input model.LoginUser) (*model.AuthPayload, error) {
 
 	err = utils.ComparePassword(user.Hash, input.Password, user.Salt)
 	if err != nil {
-		return nil, fmt.Errorf("Invalid password.")
+		return nil, fmt.Errorf("Invalid username or password.")
 	}
 
-	token, err := utils.GenerateJWT(user.ID)
+	token, err := utils.GenerateJWT(user.ID, user.Role)
 	if err != nil {
 		return nil, err
 	}
