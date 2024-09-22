@@ -9,12 +9,14 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"github.com/Raditsoic/anime-go/utils"
 )
 
 var connectionString string = "mongodb://localhost:27017/"
 const databaseName string = "weebs"
 const animeCollection string = "anime"
 const mangaCollection string = "manga"
+const userCollection string = "users"
 
 const maxPoolSize = 50
 const timeoutSeconds = 30
@@ -36,6 +38,14 @@ type AnimeRepo struct {
 // MangaRepo represents the database operations for manga.
 type MangaRepo struct {
 	client *mongo.Client
+}
+
+type UserRepo struct {
+	client *mongo.Client
+}
+
+func NewUserRepo(client *mongo.Client) *UserRepo {
+	return &UserRepo{client: client}
 }
 
 // NewAnimeRepo creates a new AnimeRepo instance.
@@ -173,4 +183,50 @@ func (db *MangaRepo) Create(manga *model.Manga) error {
 }
 
 
+func (db *UserRepo) Register(user *model.User) error {
+	userCol := db.client.Database(databaseName).Collection(userCollection)
+	_, err := userCol.InsertOne(context.TODO(), user)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (db *UserRepo) GetByEmail(email string) (*model.User, error) {
+	col := db.client.Database(databaseName).Collection(userCollection)
+	ctx, cancel := utils.GetContextWithTimeout()
+	defer cancel()
+
+	filter := bson.M{"email": email}
+	var user model.User
+	err := col.FindOne(ctx, filter).Decode(&user)
+	if err == mongo.ErrNoDocuments {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (db *UserRepo) GetByUsername(username string) (*model.User, error) {
+	col := db.client.Database(databaseName).Collection(userCollection)
+	ctx, cancel := utils.GetContextWithTimeout()
+	defer cancel()
+
+	filter := bson.M{"username": username}
+	var user model.User
+	err := col.FindOne(ctx, filter).Decode(&user)
+	if err == mongo.ErrNoDocuments {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
 
