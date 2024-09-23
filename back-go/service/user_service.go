@@ -3,16 +3,16 @@ package service
 import (
 	"fmt"
 
-	"github.com/Raditsoic/anime-go/database"
+	"github.com/Raditsoic/anime-go/database/repository"
 	"github.com/Raditsoic/anime-go/graph/model"
 	"github.com/Raditsoic/anime-go/utils"
 )
 
 type UserService struct {
-	UserRepo database.UserRepo
+	UserRepo repository.UserRepo
 }
 
-func NewUserService(repo database.UserRepo) *UserService {
+func NewUserService(repo repository.UserRepo) *UserService {
 	return &UserService{UserRepo: repo}
 }
 
@@ -47,10 +47,10 @@ func (s *UserService) Register(input model.RegisterUser) (*model.AuthPayload, er
 	user := &model.User{
 		ID:       userID,
 		Username: input.Username,
-		Email: input.Email,
-		Salt: salt,
-		Hash: hashedPassword,
-		Role: "user",
+		Email:    input.Email,
+		Salt:     salt,
+		Hash:     hashedPassword,
+		Role:     "user",
 	}
 	if err := s.UserRepo.Register(user); err != nil {
 		return nil, err
@@ -63,7 +63,7 @@ func (s *UserService) Register(input model.RegisterUser) (*model.AuthPayload, er
 
 	return &model.AuthPayload{
 		Token: token,
-		User: user,
+		User:  user,
 	}, nil
 }
 
@@ -88,6 +88,6 @@ func (s *UserService) Login(input model.LoginUser) (*model.AuthPayload, error) {
 
 	return &model.AuthPayload{
 		Token: token,
-		User: user,
+		User:  user,
 	}, nil
 }

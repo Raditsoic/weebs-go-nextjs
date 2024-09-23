@@ -3,16 +3,16 @@ package service
 import (
 	"fmt"
 
-	"github.com/Raditsoic/anime-go/database"
+	"github.com/Raditsoic/anime-go/database/repository"
 	"github.com/Raditsoic/anime-go/graph/model"
 	"github.com/Raditsoic/anime-go/utils"
 )
 
 type MangaService struct {
-	MangaRepo database.MangaRepo
+	MangaRepo repository.MangaRepo
 }
 
-func NewMangaService(repo database.MangaRepo) *MangaService {
+func NewMangaService(repo repository.MangaRepo) *MangaService {
 	return &MangaService{MangaRepo: repo}
 }
 
@@ -51,14 +51,14 @@ func (s *MangaService) GetMangas() ([]*model.Manga, error) {
 }
 
 func (s *MangaService) GetMangaByID(id string) (*model.Manga, error) {
-    mangaInterface, err := s.MangaRepo.GetByID(id)
-    if err != nil {
-        return nil, err
-    }
+	mangaInterface, err := s.MangaRepo.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
 
-    manga, ok := mangaInterface.(*model.Manga)
-    if !ok {
-        return nil, fmt.Errorf("unexpected type in MangaRepo: %T", mangaInterface)
-    }
-    return manga, nil
+	manga, ok := mangaInterface.(*model.Manga)
+	if !ok {
+		return nil, fmt.Errorf("unexpected type in MangaRepo: %T", mangaInterface)
+	}
+	return manga, nil
 }

@@ -4,32 +4,32 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Raditsoic/anime-go/database"
+	"github.com/Raditsoic/anime-go/database/repository"
 	"github.com/Raditsoic/anime-go/graph/model"
 	"github.com/Raditsoic/anime-go/utils"
 )
 
 type ReviewService struct {
-	ReviewRepo database.ReviewRepo
+	ReviewRepo repository.ReviewRepo
 }
 
-func NewReviewService(repo database.ReviewRepo) *ReviewService {
+func NewReviewService(repo repository.ReviewRepo) *ReviewService {
 	return &ReviewService{ReviewRepo: repo}
 }
 
 func (s *ReviewService) SaveReview(input model.NewReview, userID string) (*model.Review, error) {
 	var review *model.Review
 	var err error
-	
+
 	if input.ID == nil {
 		review = &model.Review{
-			ID:          "review_" + utils.GenerateUUID(), 
+			ID:          "review_" + utils.GenerateUUID(),
 			UserID:      userID,
 			ContentID:   *input.ContentID,
 			ContentType: input.ContentType,
 			Rating:      input.Rating,
 			Comment:     input.Comment,
-			CreatedAt:   time.Now().Format(time.RFC1123), 
+			CreatedAt:   time.Now().Format(time.RFC1123),
 		}
 
 		err = s.ReviewRepo.Create(review)
@@ -37,7 +37,7 @@ func (s *ReviewService) SaveReview(input model.NewReview, userID string) (*model
 			return nil, err
 		}
 	} else {
-		review, err = s.ReviewRepo.GetReviewByID(*input.ID) 
+		review, err = s.ReviewRepo.GetReviewByID(*input.ID)
 		if err != nil {
 			return nil, err
 		}
