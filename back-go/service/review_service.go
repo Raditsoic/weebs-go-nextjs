@@ -20,8 +20,8 @@ func NewReviewService(repo database.ReviewRepo) *ReviewService {
 func (s *ReviewService) SaveReview(input model.NewReview, userID string) (*model.Review, error) {
 	var review *model.Review
 	var err error
-
-	if input.ContentID == nil {
+	
+	if input.ID == nil {
 		review = &model.Review{
 			ID:          "review_" + utils.GenerateUUID(), 
 			UserID:      userID,
@@ -29,7 +29,7 @@ func (s *ReviewService) SaveReview(input model.NewReview, userID string) (*model
 			ContentType: input.ContentType,
 			Rating:      input.Rating,
 			Comment:     input.Comment,
-			CreatedAt:   time.Now().Format(time.RFC3339), 
+			CreatedAt:   time.Now().Format(time.RFC1123), 
 		}
 
 		err = s.ReviewRepo.Create(review)
@@ -37,7 +37,7 @@ func (s *ReviewService) SaveReview(input model.NewReview, userID string) (*model
 			return nil, err
 		}
 	} else {
-		review, err = s.ReviewRepo.GetReviewByID(*input.ContentID) 
+		review, err = s.ReviewRepo.GetReviewByID(*input.ID) 
 		if err != nil {
 			return nil, err
 		}

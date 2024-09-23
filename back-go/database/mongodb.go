@@ -3,12 +3,14 @@ package database
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
 	"github.com/Raditsoic/anime-go/graph/model"
 	"github.com/Raditsoic/anime-go/utils"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -256,16 +258,21 @@ func (db *ReviewRepo) GetReviewByID(id string) (*model.Review, error) {
 	ctx, cancel := utils.GetContextWithTimeout()
 	defer cancel()
 
-	filter := bson.M{"_id": id}
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ID format: %v", err)
+	}
+
+	filter := bson.M{"_id": objectID}
 	var review model.Review
 
-	err := col.FindOne(ctx, filter).Decode(&review)
+	err = col.FindOne(ctx, filter).Decode(&review)
 	if err == mongo.ErrNoDocuments {
-		return nil, ErrReviewNotFound 
+		return nil, ErrReviewNotFound
 	}
 
 	if err != nil {
-		return nil, err 
+		return nil, err
 	}
 
 	return &review, nil
@@ -276,7 +283,12 @@ func (db *ReviewRepo) UpdateReview(review *model.Review) error {
 	ctx, cancel := utils.GetContextWithTimeout()
 	defer cancel()
 
-	filter := bson.M{"_id": review.ID}
+	objectID, err := primitive.ObjectIDFromHex(review.ID)
+	if err != nil {
+		return nil
+	}
+
+	filter := bson.M{"_id": objectID}
 	update := bson.M{"$set": review}
 
 	result, err := col.UpdateOne(ctx, filter, update)
@@ -285,7 +297,7 @@ func (db *ReviewRepo) UpdateReview(review *model.Review) error {
 	}
 
 	if result.MatchedCount == 0 {
-		return ErrReviewNotFound 
+		return ErrReviewNotFound
 	}
 
 	if result.ModifiedCount == 0 {

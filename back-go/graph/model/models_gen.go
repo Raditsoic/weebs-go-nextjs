@@ -51,6 +51,7 @@ type NewManga struct {
 }
 
 type NewReview struct {
+	ID          *string `json:"id,omitempty"`
 	ContentID   *string `json:"contentID,omitempty"`
 	ContentType string  `json:"contentType"`
 	Comment     string  `json:"comment"`

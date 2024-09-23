@@ -69,6 +69,7 @@ input LoginUser {
 }
 
 input NewReview {
+  id: ID
   contentID: ID
   contentType: String!
   comment: String!

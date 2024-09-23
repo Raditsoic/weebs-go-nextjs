@@ -4711,13 +4711,20 @@ func (ec *executionContext) unmarshalInputNewReview(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"contentID", "contentType", "comment", "rating"}
+	fieldsInOrder := [...]string{"id", "contentID", "contentType", "comment", "rating"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
 		case "contentID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentID"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
