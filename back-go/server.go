@@ -25,15 +25,18 @@ func main() {
 	animeRepo := database.NewAnimeRepo(database.Connect())
 	mangaRepo := database.NewMangaRepo(database.Connect())
 	userRepo := database.NewUserRepo(database.Connect())
+	reviewRepo := database.NewReviewRepo(database.Connect())
 
 	animeService := service.NewAnimeService(*animeRepo)
 	mangaService := service.NewMangaService(*mangaRepo)
 	userService := service.NewUserService(*userRepo)
+	reviewService := service.NewReviewService(*reviewRepo)
 
 	resolver := &graph.Resolver{
 		AnimeService: animeService,
 		MangaService: mangaService,
 		UserService: userService,
+		ReviewService: reviewService,
 	}
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))

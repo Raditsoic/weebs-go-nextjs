@@ -2,21 +2,26 @@ package database
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
 	"time"
 
 	"github.com/Raditsoic/anime-go/graph/model"
+	"github.com/Raditsoic/anime-go/utils"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"github.com/Raditsoic/anime-go/utils"
 )
 
 var connectionString string = "mongodb://localhost:27017/"
+
 const databaseName string = "weebs"
 const animeCollection string = "anime"
 const mangaCollection string = "manga"
 const userCollection string = "users"
+const reviewCollection string = "reviews"
 
 const maxPoolSize = 50
 const timeoutSeconds = 30
@@ -44,6 +49,10 @@ type UserRepo struct {
 	client *mongo.Client
 }
 
+type ReviewRepo struct {
+	client *mongo.Client
+}
+
 func NewUserRepo(client *mongo.Client) *UserRepo {
 	return &UserRepo{client: client}
 }
@@ -56,6 +65,10 @@ func NewAnimeRepo(client *mongo.Client) *AnimeRepo {
 // NewMangaRepo creates a new MangaRepo instance.
 func NewMangaRepo(client *mongo.Client) *MangaRepo {
 	return &MangaRepo{client: client}
+}
+
+func NewReviewRepo(client *mongo.Client) *ReviewRepo {
+	return &ReviewRepo{client: client}
 }
 
 // Connect establishes a connection to the MongoRepo database.
@@ -85,7 +98,7 @@ func (db *AnimeRepo) GetByID(id string) (interface{}, error) {
 	var anime model.Anime
 	err := col.FindOne(ctx, filter).Decode(&anime)
 	if err == mongo.ErrNoDocuments {
-		return nil, nil 
+		return nil, nil
 	}
 
 	if err != nil {
@@ -182,7 +195,6 @@ func (db *MangaRepo) Create(manga *model.Manga) error {
 	return nil
 }
 
-
 func (db *UserRepo) Register(user *model.User) error {
 	userCol := db.client.Database(databaseName).Collection(userCollection)
 	_, err := userCol.InsertOne(context.TODO(), user)
@@ -230,3 +242,67 @@ func (db *UserRepo) GetByUsername(username string) (*model.User, error) {
 	return &user, nil
 }
 
+func (db *ReviewRepo) Create(review *model.Review) error {
+	reviewCol := db.client.Database(databaseName).Collection(reviewCollection)
+	_, err := reviewCol.InsertOne(context.TODO(), review)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+var ErrReviewNotFound = errors.New("Review not found.")
+
+func (db *ReviewRepo) GetReviewByID(id string) (*model.Review, error) {
+	col := db.client.Database(databaseName).Collection(reviewCollection)
+	ctx, cancel := utils.GetContextWithTimeout()
+	defer cancel()
+
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ID format: %v", err)
+	}
+
+	filter := bson.M{"_id": objectID}
+	var review model.Review
+
+	err = col.FindOne(ctx, filter).Decode(&review)
+	if err == mongo.ErrNoDocuments {
+		return nil, ErrReviewNotFound
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &review, nil
+}
+
+func (db *ReviewRepo) UpdateReview(review *model.Review) error {
+	col := db.client.Database(databaseName).Collection(reviewCollection)
+	ctx, cancel := utils.GetContextWithTimeout()
+	defer cancel()
+
+	objectID, err := primitive.ObjectIDFromHex(review.ID)
+	if err != nil {
+		return nil
+	}
+
+	filter := bson.M{"_id": objectID}
+	update := bson.M{"$set": review}
+
+	result, err := col.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+
+	if result.MatchedCount == 0 {
+		return ErrReviewNotFound
+	}
+
+	if result.ModifiedCount == 0 {
+		return errors.New("review update failed: no changes detected")
+	}
+
+	return nil
+}

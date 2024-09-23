@@ -61,6 +61,23 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginUser) (*m
 	return r.UserService.Login(input)
 }
 
+// SaveReview is the resolver for the saveReview field.
+func (r *mutationResolver) SaveReview(ctx context.Context, input model.NewReview) (*model.Review, error) {
+	claims := ctx.Value(middleware.UserContextKey)
+	if claims == nil {
+		return nil, fmt.Errorf("Unauthorized.")
+	}
+
+	userClaims, ok := claims.(*utils.Claims)
+	if !ok {
+		return nil, fmt.Errorf("Invalid token.")
+	}
+
+	userID := userClaims.ID
+
+	return r.ReviewService.SaveReview(input, userID)
+}
+
 // Animes is the resolver for the animes field.
 func (r *queryResolver) Animes(ctx context.Context) ([]*model.Anime, error) {
 	claims := ctx.Value(middleware.UserContextKey)
