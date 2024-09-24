@@ -25,7 +25,7 @@ func (db *MangaRepo) GetByID(id string) (interface{}, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	filter := bson.M{"_id": id}
+	filter := bson.M{"id": id}
 	var manga model.Manga
 	err := col.FindOne(ctx, filter).Decode(&manga)
 	if err == mongo.ErrNoDocuments {

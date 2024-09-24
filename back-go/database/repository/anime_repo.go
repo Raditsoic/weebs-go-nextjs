@@ -25,7 +25,7 @@ func (db *AnimeRepo) GetByID(id string) (interface{}, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	filter := bson.M{"_id": id}
+	filter := bson.M{"id": id}
 	var anime model.Anime
 	err := col.FindOne(ctx, filter).Decode(&anime)
 	if err == mongo.ErrNoDocuments {
@@ -63,7 +63,7 @@ func (db *AnimeRepo) GetAll() ([]interface{}, error) {
 
 func (db *AnimeRepo) Create(anime *model.Anime) error {
 	anime.ID = "anime" + utils.GenerateUUID()
-	
+
 	col := db.client.Database("weebs").Collection("anime")
 	_, err := col.InsertOne(context.TODO(), anime)
 	return err

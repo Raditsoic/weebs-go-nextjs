@@ -3,13 +3,11 @@ package repository
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/Raditsoic/anime-go/graph/model"
 	"github.com/Raditsoic/anime-go/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var ErrReviewNotFound = errors.New("Review not found.")
@@ -26,7 +24,7 @@ func NewReviewRepo(client *mongo.Client) *ReviewRepo {
 
 // Create inserts a new review into the database.
 func (db *ReviewRepo) Create(review *model.Review) error {
-	review.ID = "review-" + utils.GenerateUUID()
+	review.ID = "review_" + utils.GenerateUUID()
 
 	col := db.client.Database("weebs").Collection("reviews")
 	_, err := col.InsertOne(context.TODO(), review)
@@ -39,15 +37,10 @@ func (db *ReviewRepo) GetReviewByID(id string) (*model.Review, error) {
 	ctx, cancel := utils.GetContextWithTimeout()
 	defer cancel()
 
-	objectID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, fmt.Errorf("invalid ID format: %v", err)
-	}
-
-	filter := bson.M{"_id": objectID}
+	filter := bson.M{"id": id}
 	var review model.Review
 
-	err = col.FindOne(ctx, filter).Decode(&review)
+	err := col.FindOne(ctx, filter).Decode(&review)
 	if err == mongo.ErrNoDocuments {
 		return nil, ErrReviewNotFound
 	}
@@ -59,24 +52,30 @@ func (db *ReviewRepo) GetReviewByID(id string) (*model.Review, error) {
 	return &review, nil
 }
 
-// Update all Retrieve Func from the database.
-
 // UpdateReview updates an existing review in the database.
 func (db *ReviewRepo) UpdateReview(review *model.Review) error {
 	col := db.client.Database("weebs").Collection("reviews")
 	ctx, cancel := utils.GetContextWithTimeout()
 	defer cancel()
 
-	objectID, err := primitive.ObjectIDFromHex(review.ID)
-	if err != nil {
-		return err
-	}
-
-	filter := bson.M{"_id": objectID}
+	filter := bson.M{"id": review.ID}
 	update := bson.M{
 		"$set": review,
 	}
 
-	_, err = col.UpdateOne(ctx, filter, update)
-	return err
+	result, err := col.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+
+	if result.MatchedCount == 0 {
+		return errors.New("review not found")
+	}
+
+	if result.ModifiedCount == 0 {
+		return errors.New("review update failed: no changes detected")
+	}
+
+	return nil
+
 }
