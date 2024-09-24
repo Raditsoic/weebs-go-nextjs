@@ -5,7 +5,6 @@ import (
 
 	"github.com/Raditsoic/anime-go/database/repository"
 	"github.com/Raditsoic/anime-go/graph/model"
-	"github.com/Raditsoic/anime-go/utils"
 )
 
 type AnimeService struct {
@@ -18,7 +17,6 @@ func NewAnimeService(repo repository.AnimeRepo) *AnimeService {
 
 func (s *AnimeService) CreateAnime(input model.NewAnime) (*model.Anime, error) {
 	anime := &model.Anime{
-		ID:          fmt.Sprint(utils.GenerateUUID()),
 		Title:       input.Title,
 		Image:       input.Image,
 		Description: input.Description,
@@ -27,6 +25,7 @@ func (s *AnimeService) CreateAnime(input model.NewAnime) (*model.Anime, error) {
 			Name: "Genre " + input.GenreID,
 		},
 	}
+
 	if err := s.AnimeRepo.Create(anime); err != nil {
 		return nil, err
 	}

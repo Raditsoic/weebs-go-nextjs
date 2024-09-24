@@ -1,4 +1,4 @@
-type Anime {
+interface Content {
   id: ID!
   title: String!
   image: String!
@@ -6,21 +6,30 @@ type Anime {
   genre: Genre!
 }
 
-type Manga {
+type Anime implements Content {
   id: ID!
   title: String!
   image: String!
   description: String!
-  genre: Genre!  
+  genre: Genre!
 }
 
+type Manga implements Content {
+  id: ID!
+  title: String!
+  image: String!
+  description: String!
+  genre: Genre!
+}
+
+scalar DateTime
+
 type User {
-  id: ID! 
+  id: ID!
   username: String!
   email: String!
-  salt: String!
-  hash: String!
   role: String!
+  createdAt: DateTime!
 }
 
 type Genre {
@@ -32,29 +41,28 @@ type Review {
   id: ID!
   userID: ID!
   contentID: ID!
-  contentType: String!
+  contentType: ContentType!
   rating: Float!
   comment: String!
-  createdAt: String!
+  createdAt: DateTime!
 }
 
 type AuthPayload {
   token: String!
-  user: User!
 }
 
 input NewAnime {
   title: String!
   image: String!
   description: String!
-  genreId: ID!
+  genreID: ID!
 }
 
 input NewManga {
   title: String!
   image: String!
   description: String!
-  genreId: ID!
+  genreID: ID!
 }
 
 input RegisterUser {
@@ -69,11 +77,15 @@ input LoginUser {
 }
 
 input NewReview {
-  id: ID
-  contentID: ID
-  contentType: String!
+  contentID: ID!
+  contentType: ContentType!
   comment: String!
   rating: Float!
+}
+
+enum ContentType {
+  anime
+  manga
 }
 
 type Query {
@@ -81,6 +93,8 @@ type Query {
   mangas: [Manga!]!
   oneAnime(id: ID!): Anime!
   oneManga(id: ID!): Manga!
+  genres: [Genre!]!
+  me: User!
 }
 
 type Mutation {
@@ -89,4 +103,4 @@ type Mutation {
   register(input: RegisterUser!): AuthPayload!
   login(input: LoginUser!): AuthPayload!
   saveReview(input: NewReview!): Review!
-} 
+}

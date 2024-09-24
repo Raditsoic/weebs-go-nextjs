@@ -33,7 +33,7 @@ func main() {
 	animeService := service.NewAnimeService(*animeRepo)
 	mangaService := service.NewMangaService(*mangaRepo)
 	userService := service.NewUserService(*userRepo)
-	reviewService := service.NewReviewService(*reviewRepo)
+	reviewService := service.NewReviewService(*reviewRepo, *animeRepo, *mangaRepo)
 
 	resolver := &graph.Resolver{
 		AnimeService: animeService,

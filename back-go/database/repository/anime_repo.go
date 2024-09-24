@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/Raditsoic/anime-go/graph/model"
+	"github.com/Raditsoic/anime-go/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -61,6 +62,8 @@ func (db *AnimeRepo) GetAll() ([]interface{}, error) {
 }
 
 func (db *AnimeRepo) Create(anime *model.Anime) error {
+	anime.ID = "anime" + utils.GenerateUUID()
+	
 	col := db.client.Database("weebs").Collection("anime")
 	_, err := col.InsertOne(context.TODO(), anime)
 	return err

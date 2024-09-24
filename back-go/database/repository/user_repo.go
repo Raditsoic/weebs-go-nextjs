@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"github.com/Raditsoic/anime-go/graph/model"
 	"github.com/Raditsoic/anime-go/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -19,10 +20,17 @@ func NewUserRepo(client *mongo.Client) *UserRepo {
 }
 
 // Register inserts a new user into the database.
-func (db *UserRepo) Register(user *model.User) error {
+func (db *UserRepo) Register(user *model.User, salt string, hashedPassword string) (result *model.User, err error) {
+	user.Salt = salt
+	user.Hash = hashedPassword
+	user.ID = "user_" + utils.GenerateUUID()
+
 	col := db.client.Database("weebs").Collection("users")
-	_, err := col.InsertOne(context.TODO(), user)
-	return err
+	if _, err := col.InsertOne(context.TODO(), user); err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 // GetByEmail retrieves a user by email.

@@ -2,6 +2,21 @@
 
 package model
 
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
+type Content interface {
+	IsContent()
+	GetID() string
+	GetTitle() string
+	GetImage() string
+	GetDescription() string
+	GetGenre() *Genre
+}
+
 type Anime struct {
 	ID          string `json:"id"`
 	Title       string `json:"title"`
@@ -10,9 +25,15 @@ type Anime struct {
 	Genre       *Genre `json:"genre"`
 }
 
+func (Anime) IsContent()                  {}
+func (this Anime) GetID() string          { return this.ID }
+func (this Anime) GetTitle() string       { return this.Title }
+func (this Anime) GetImage() string       { return this.Image }
+func (this Anime) GetDescription() string { return this.Description }
+func (this Anime) GetGenre() *Genre       { return this.Genre }
+
 type AuthPayload struct {
 	Token string `json:"token"`
-	User  *User  `json:"user"`
 }
 
 type Genre struct {
@@ -33,6 +54,13 @@ type Manga struct {
 	Genre       *Genre `json:"genre"`
 }
 
+func (Manga) IsContent()                  {}
+func (this Manga) GetID() string          { return this.ID }
+func (this Manga) GetTitle() string       { return this.Title }
+func (this Manga) GetImage() string       { return this.Image }
+func (this Manga) GetDescription() string { return this.Description }
+func (this Manga) GetGenre() *Genre       { return this.Genre }
+
 type Mutation struct {
 }
 
@@ -40,22 +68,21 @@ type NewAnime struct {
 	Title       string `json:"title"`
 	Image       string `json:"image"`
 	Description string `json:"description"`
-	GenreID     string `json:"genreId"`
+	GenreID     string `json:"genreID"`
 }
 
 type NewManga struct {
 	Title       string `json:"title"`
 	Image       string `json:"image"`
 	Description string `json:"description"`
-	GenreID     string `json:"genreId"`
+	GenreID     string `json:"genreID"`
 }
 
 type NewReview struct {
-	ID          *string `json:"id,omitempty"`
-	ContentID   *string `json:"contentID,omitempty"`
-	ContentType string  `json:"contentType"`
-	Comment     string  `json:"comment"`
-	Rating      float64 `json:"rating"`
+	ContentID   string      `json:"contentID"`
+	ContentType ContentType `json:"contentType"`
+	Comment     string      `json:"comment"`
+	Rating      float64     `json:"rating"`
 }
 
 type Query struct {
@@ -68,20 +95,62 @@ type RegisterUser struct {
 }
 
 type Review struct {
-	ID          string  `json:"id"`
-	UserID      string  `json:"userID"`
-	ContentID   string  `json:"contentID"`
-	ContentType string  `json:"contentType"`
-	Rating      float64 `json:"rating"`
-	Comment     string  `json:"comment"`
-	CreatedAt   string  `json:"createdAt"`
+	ID          string      `json:"id"`
+	UserID      string      `json:"userID"`
+	ContentID   string      `json:"contentID"`
+	ContentType ContentType `json:"contentType"`
+	Rating      float64     `json:"rating"`
+	Comment     string      `json:"comment"`
+	CreatedAt   string      `json:"createdAt"`
 }
 
 type User struct {
-	ID       string `json:"id"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Salt     string `json:"salt"`
-	Hash     string `json:"hash"`
-	Role     string `json:"role"`
+	ID        string `json:"id"`
+	Username  string `json:"username"`
+	Email     string `json:"email"`
+	Role      string `json:"role"`
+	Salt 	  string `json:"salt"`
+	Hash 	  string `json:"hash"`
+	CreatedAt string `json:"createdAt"`
+}
+
+type ContentType string
+
+const (
+	ContentTypeAnime ContentType = "anime"
+	ContentTypeManga ContentType = "manga"
+)
+
+var AllContentType = []ContentType{
+	ContentTypeAnime,
+	ContentTypeManga,
+}
+
+func (e ContentType) IsValid() bool {
+	switch e {
+	case ContentTypeAnime, ContentTypeManga:
+		return true
+	}
+	return false
+}
+
+func (e ContentType) String() string {
+	return string(e)
+}
+
+func (e *ContentType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ContentType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ContentType", str)
+	}
+	return nil
+}
+
+func (e ContentType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

@@ -118,6 +118,16 @@ func (r *queryResolver) OneManga(ctx context.Context, id string) (*model.Manga, 
 	return r.MangaService.GetMangaByID(id)
 }
 
+// Genres is the resolver for the genres field.
+func (r *queryResolver) Genres(ctx context.Context) ([]*model.Genre, error) {
+	panic(fmt.Errorf("not implemented: Genres - genres"))
+}
+
+// Me is the resolver for the me field.
+func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Me - me"))
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 

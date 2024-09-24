@@ -26,6 +26,8 @@ func NewReviewRepo(client *mongo.Client) *ReviewRepo {
 
 // Create inserts a new review into the database.
 func (db *ReviewRepo) Create(review *model.Review) error {
+	review.ID = "review-" + utils.GenerateUUID()
+
 	col := db.client.Database("weebs").Collection("reviews")
 	_, err := col.InsertOne(context.TODO(), review)
 	return err
@@ -56,6 +58,8 @@ func (db *ReviewRepo) GetReviewByID(id string) (*model.Review, error) {
 
 	return &review, nil
 }
+
+// Update all Retrieve Func from the database.
 
 // UpdateReview updates an existing review in the database.
 func (db *ReviewRepo) UpdateReview(review *model.Review) error {

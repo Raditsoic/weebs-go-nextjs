@@ -5,7 +5,6 @@ import (
 
 	"github.com/Raditsoic/anime-go/database/repository"
 	"github.com/Raditsoic/anime-go/graph/model"
-	"github.com/Raditsoic/anime-go/utils"
 )
 
 type MangaService struct {
@@ -18,7 +17,6 @@ func NewMangaService(repo repository.MangaRepo) *MangaService {
 
 func (s *MangaService) CreateManga(input model.NewManga) (*model.Manga, error) {
 	manga := &model.Manga{
-		ID:          fmt.Sprint(utils.GenerateUUID()),
 		Title:       input.Title,
 		Image:       input.Image,
 		Description: input.Description,

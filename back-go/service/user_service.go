@@ -33,7 +33,6 @@ func (s *UserService) Register(input model.RegisterUser) (*model.AuthPayload, er
 		return nil, fmt.Errorf("Username is already used.")
 	}
 
-	userID := "user_" + utils.GenerateUUID()
 	salt, err := utils.GenerateSalt(16)
 	if err != nil {
 		return nil, err
@@ -45,25 +44,22 @@ func (s *UserService) Register(input model.RegisterUser) (*model.AuthPayload, er
 	}
 
 	user := &model.User{
-		ID:       userID,
 		Username: input.Username,
 		Email:    input.Email,
-		Salt:     salt,
-		Hash:     hashedPassword,
 		Role:     "user",
 	}
-	if err := s.UserRepo.Register(user); err != nil {
+	result, err := s.UserRepo.Register(user, salt, hashedPassword)
+	if err != nil {
 		return nil, err
 	}
 
-	token, err := utils.GenerateJWT(user.ID, user.Role)
+	token, err := utils.GenerateJWT(result.ID, user.Role)
 	if err != nil {
 		return nil, err
 	}
 
 	return &model.AuthPayload{
 		Token: token,
-		User:  user,
 	}, nil
 }
 
@@ -88,6 +84,5 @@ func (s *UserService) Login(input model.LoginUser) (*model.AuthPayload, error) {
 
 	return &model.AuthPayload{
 		Token: token,
-		User:  user,
 	}, nil
 }
