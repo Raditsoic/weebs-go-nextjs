@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/Raditsoic/anime-go/database/repository"
 	"github.com/Raditsoic/anime-go/graph/model"
@@ -19,6 +20,7 @@ func NewUserService(repo repository.UserRepo) *UserService {
 func (s *UserService) Register(input model.RegisterUser) (*model.AuthPayload, error) {
 	existingEmail, err := s.UserRepo.GetByEmail(input.Email)
 	if err != nil {
+		log.Printf("Failed to register user: %v", err)
 		return nil, fmt.Errorf("Failed to register user.")
 	}
 	if existingEmail != nil {
@@ -27,6 +29,7 @@ func (s *UserService) Register(input model.RegisterUser) (*model.AuthPayload, er
 
 	exitingUsername, err := s.UserRepo.GetByUsername(input.Username)
 	if err != nil {
+		log.Printf("Failed to register user: %v", err)
 		return nil, fmt.Errorf("Failed to register user.")
 	}
 	if exitingUsername != nil {
@@ -35,11 +38,13 @@ func (s *UserService) Register(input model.RegisterUser) (*model.AuthPayload, er
 
 	salt, err := utils.GenerateSalt(16)
 	if err != nil {
+		log.Printf("Error generating salt: %v", err)
 		return nil, err
 	}
 
 	hashedPassword, err := utils.HashPassword(input.Password, salt)
 	if err != nil {
+		log.Printf("Error hashing password: %v", err)
 		return nil, err
 	}
 
@@ -50,11 +55,13 @@ func (s *UserService) Register(input model.RegisterUser) (*model.AuthPayload, er
 	}
 	result, err := s.UserRepo.Register(user, salt, hashedPassword)
 	if err != nil {
+		log.Printf("Error registering user: %v", err)
 		return nil, err
 	}
 
 	token, err := utils.GenerateJWT(result.ID, user.Role)
 	if err != nil {
+		log.Printf("Error generating JWT: %v", err)
 		return nil, err
 	}
 
