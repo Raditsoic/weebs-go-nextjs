@@ -8,6 +8,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/Raditsoic/anime-go/database"
+	"github.com/Raditsoic/anime-go/database/repository"
 	"github.com/Raditsoic/anime-go/graph"
 	"github.com/Raditsoic/anime-go/middleware"
 	"github.com/Raditsoic/anime-go/service"
@@ -22,15 +23,17 @@ func main() {
 		port = defaultPort
 	}
 
-	animeRepo := database.NewAnimeRepo(database.Connect())
-	mangaRepo := database.NewMangaRepo(database.Connect())
-	userRepo := database.NewUserRepo(database.Connect())
-	reviewRepo := database.NewReviewRepo(database.Connect())
+	client := database.Connect()
+
+	animeRepo := repository.NewAnimeRepo(client)
+	mangaRepo := repository.NewMangaRepo(client)
+	userRepo := repository.NewUserRepo(client)
+	reviewRepo := repository.NewReviewRepo(client)
 
 	animeService := service.NewAnimeService(*animeRepo)
 	mangaService := service.NewMangaService(*mangaRepo)
 	userService := service.NewUserService(*userRepo)
-	reviewService := service.NewReviewService(*reviewRepo)
+	reviewService := service.NewReviewService(*reviewRepo, *animeRepo, *mangaRepo)
 
 	resolver := &graph.Resolver{
 		AnimeService: animeService,
