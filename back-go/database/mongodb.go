@@ -20,7 +20,7 @@ func Connect() *mongo.Client {
 		// Check if MONGO_URI is set, otherwise use the default connectionString
 		mongoURI := os.Getenv("MONGO_URI")
 		if mongoURI == "" {
-			mongoURI = "mongodb://root:soic@localhost:27017"
+			mongoURI = "mongodb://mongo:27017"
 		}
 
 		clientOptions := options.Client().ApplyURI(mongoURI)
