@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 interface Content {
   id: ID!
   title: String!
@@ -104,3 +105,51 @@ type Mutation {
   login(input: LoginUser!): AuthPayload!
   saveReview(input: NewReview!): Review!
 }
+=======
+type Anime {
+  id: ID!
+  title: String!
+  image: String!
+  description: String!
+  genre: Genre!
+}
+
+type Manga {
+  id: ID!
+  title: String!
+  image: String!
+  description: String!
+  genre: Genre!  
+}
+
+type Genre {
+  id: ID!
+  name: String!
+}
+
+type Query {
+  animes: [Anime!]!
+  mangas: [Manga!]!
+  oneAnime(id: ID!): Anime!
+  oneManga(id: ID!): Manga!
+}
+
+input NewAnime {
+  title: String!
+  image: String!
+  description: String!
+  genreId: ID!
+}
+
+input NewManga {
+  title: String!
+  image: String!
+  description: String!
+  genreId: ID!
+}
+
+type Mutation {
+  createAnime(input: NewAnime!): Anime!
+  createManga(input: NewManga!): Manga!
+}
+>>>>>>> 9b9b4dc (Add: front-end)

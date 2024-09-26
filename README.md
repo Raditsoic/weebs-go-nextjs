@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Weebs
 
 Implementation of **NextJS - Go - GraphQL - MongoDB** in Anime & Manga List Web App
@@ -54,3 +55,10 @@ sudo systemctl start mongod
 go run server.go
 ```
 5. Access the app on http://localhost:8080
+=======
+# Weebs
+
+## By Raditsoic
+
+Implementation of **NextJS - React - Go - GraphQL - MongoDB** in Anime & Manga List Web App
+>>>>>>> 9b9b4dc (Add: front-end)
