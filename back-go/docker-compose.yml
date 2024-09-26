@@ -1,26 +1,28 @@
-version: '3.9'
+  version: '3.9'
 
-services:
-  app:
-    build: .
-    container_name: weebs-server
-    ports:
-      - "8080:8080"
-    env_file:
-      - .env
-    depends_on:
-      - mongo
+  services:
+    app:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      container_name: weebs-server
+      ports:
+        - "8080:8080"
+      env_file:
+        - .env
+      depends_on:
+        - mongo
 
-  mongo:
-    image: mongo:latest
-    container_name: weebs-mongodb
-    ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-    volumes:
-      - mongo-data:/data/db
+    mongo:
+      image: mongo:latest
+      container_name: weebs-mongodb
+      ports:
+        - "27017:27017"
+      environment:
+        MONGO_INITDB_ROOT_USERNAME: root
+        MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      volumes:
+        - mongo-data:/data/db
 
-volumes:
-  mongo-data:
+  volumes:
+    mongo-data:
