@@ -62,3 +62,4 @@ func (s *AnimeService) GetAnimeByID(id string) (*model.Anime, error) {
 	}
 	return anime, nil
 }
+

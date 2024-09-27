@@ -27,11 +27,12 @@ func main() {
 
 	animeRepo := repository.NewAnimeRepo(client)
 	mangaRepo := repository.NewMangaRepo(client)
+	mangaListRepo := repository.NewMangaListRepo(client)
 	userRepo := repository.NewUserRepo(client)
 	reviewRepo := repository.NewReviewRepo(client)
 
 	animeService := service.NewAnimeService(*animeRepo)
-	mangaService := service.NewMangaService(*mangaRepo)
+	mangaService := service.NewMangaService(*mangaRepo, *mangaListRepo)
 	userService := service.NewUserService(*userRepo)
 	reviewService := service.NewReviewService(*reviewRepo, *animeRepo, *mangaRepo)
 

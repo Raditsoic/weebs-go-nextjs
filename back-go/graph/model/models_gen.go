@@ -17,6 +17,18 @@ type Content interface {
 	GetGenre() *Genre
 }
 
+type List interface {
+	IsList()
+	GetID() string
+	GetUserID() string
+}
+
+type ListEntries interface {
+	IsListEntries()
+	GetID() string
+	GetStatus() Status
+}
+
 type Anime struct {
 	ID          string `json:"id"`
 	Title       string `json:"title"`
@@ -31,6 +43,26 @@ func (this Anime) GetTitle() string       { return this.Title }
 func (this Anime) GetImage() string       { return this.Image }
 func (this Anime) GetDescription() string { return this.Description }
 func (this Anime) GetGenre() *Genre       { return this.Genre }
+
+type AnimeList struct {
+	ID      string              `json:"id"`
+	UserID  string              `json:"userID"`
+	Entries []*AnimeListEntries `json:"entries"`
+}
+
+func (AnimeList) IsList()                {}
+func (this AnimeList) GetID() string     { return this.ID }
+func (this AnimeList) GetUserID() string { return this.UserID }
+
+type AnimeListEntries struct {
+	ID     string `json:"id"`
+	Status Status `json:"status"`
+	Anime  *Anime `json:"anime"`
+}
+
+func (AnimeListEntries) IsListEntries()         {}
+func (this AnimeListEntries) GetID() string     { return this.ID }
+func (this AnimeListEntries) GetStatus() Status { return this.Status }
 
 type AuthPayload struct {
 	Token string `json:"token"`
@@ -61,6 +93,26 @@ func (this Manga) GetImage() string       { return this.Image }
 func (this Manga) GetDescription() string { return this.Description }
 func (this Manga) GetGenre() *Genre       { return this.Genre }
 
+type MangaList struct {
+	ID      string              `json:"id"`
+	UserID  string              `json:"userID"`
+	Entries []*MangaListEntries `json:"entries"`
+}
+
+func (MangaList) IsList()                {}
+func (this MangaList) GetID() string     { return this.ID }
+func (this MangaList) GetUserID() string { return this.UserID }
+
+type MangaListEntries struct {
+	ID     string `json:"id"`
+	Status Status `json:"status"`
+	Manga  *Manga `json:"manga"`
+}
+
+func (MangaListEntries) IsListEntries()         {}
+func (this MangaListEntries) GetID() string     { return this.ID }
+func (this MangaListEntries) GetStatus() Status { return this.Status }
+
 type Mutation struct {
 }
 
@@ -71,11 +123,21 @@ type NewAnime struct {
 	GenreID     string `json:"genreID"`
 }
 
+type NewAnimeListEntry struct {
+	Status    Status `json:"status"`
+	ContentID string `json:"contentID"`
+}
+
 type NewManga struct {
 	Title       string `json:"title"`
 	Image       string `json:"image"`
 	Description string `json:"description"`
 	GenreID     string `json:"genreID"`
+}
+
+type NewMangaListEntry struct {
+	Status    Status `json:"status"`
+	ContentID string `json:"contentID"`
 }
 
 type NewReview struct {
@@ -109,8 +171,8 @@ type User struct {
 	Username  string `json:"username"`
 	Email     string `json:"email"`
 	Role      string `json:"role"`
-	Salt 	  string `json:"salt"`
-	Hash 	  string `json:"hash"`
+	Salt      string `json:"salt"`
+	Hash      string `json:"hash"`
 	CreatedAt string `json:"createdAt"`
 }
 
@@ -152,5 +214,52 @@ func (e *ContentType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ContentType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type Status string
+
+const (
+	StatusWatching    Status = "watching"
+	StatusCompleted   Status = "completed"
+	StatusOnHold      Status = "onHold"
+	StatusDropped     Status = "dropped"
+	StatusPlanToWatch Status = "planToWatch"
+)
+
+var AllStatus = []Status{
+	StatusWatching,
+	StatusCompleted,
+	StatusOnHold,
+	StatusDropped,
+	StatusPlanToWatch,
+}
+
+func (e Status) IsValid() bool {
+	switch e {
+	case StatusWatching, StatusCompleted, StatusOnHold, StatusDropped, StatusPlanToWatch:
+		return true
+	}
+	return false
+}
+
+func (e Status) String() string {
+	return string(e)
+}
+
+func (e *Status) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Status(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Status", str)
+	}
+	return nil
+}
+
+func (e Status) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

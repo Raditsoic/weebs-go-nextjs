@@ -1,9 +1,15 @@
+# Anime and Manga Schema
 interface Content {
   id: ID!
   title: String!
   image: String!
   description: String!
   genre: Genre!
+}
+
+type Genre {
+  id: ID!
+  name: String!
 }
 
 type Anime implements Content {
@@ -22,6 +28,7 @@ type Manga implements Content {
   genre: Genre!
 }
 
+# User Schema
 scalar DateTime
 
 type User {
@@ -32,9 +39,14 @@ type User {
   createdAt: DateTime!
 }
 
-type Genre {
-  id: ID!
-  name: String!
+type AuthPayload {
+  token: String!
+}
+
+# Review Schema
+enum ContentType {
+  anime
+  manga
 }
 
 type Review {
@@ -47,10 +59,50 @@ type Review {
   createdAt: DateTime!
 }
 
-type AuthPayload {
-  token: String!
+# Anime and Manga List Schema
+enum Status {
+  watching
+  completed
+  onHold
+  dropped
+  planToWatch
 }
 
+interface List {
+  id: ID!
+  userID: ID!
+}
+
+interface ListEntries {
+  id: ID!
+  status: Status!
+}
+
+type AnimeListEntries implements ListEntries {
+  id: ID!
+  status: Status!
+  anime: Anime! 
+} 
+
+type AnimeList implements List{
+  id: ID!
+  userID: ID!
+  entries: [AnimeListEntries!]!
+}
+
+type MangaListEntries implements ListEntries {
+  id: ID!
+  status: Status!
+  manga: Manga! 
+}
+
+type MangaList implements List {
+  id: ID!
+  userID: ID!
+  entries: [MangaListEntries!]!
+}
+
+# Input for Mutations
 input NewAnime {
   title: String!
   image: String!
@@ -83,16 +135,24 @@ input NewReview {
   rating: Float!
 }
 
-enum ContentType {
-  anime
-  manga
+input NewAnimeListEntry {
+  status: Status!
+  contentID: ID!
 }
 
+input NewMangaListEntry {
+  status: Status!
+  contentID: ID!
+}
+
+# Queries and Mutations
 type Query {
   animes: [Anime!]!
   mangas: [Manga!]!
   oneAnime(id: ID!): Anime!
   oneManga(id: ID!): Manga!
+  animeList(userID: ID!): AnimeList!
+  mangaList(userID: ID!): MangaList!
   genres: [Genre!]!
   me: User!
 }
@@ -103,4 +163,8 @@ type Mutation {
   register(input: RegisterUser!): AuthPayload!
   login(input: LoginUser!): AuthPayload!
   saveReview(input: NewReview!): Review!
+  addMangaListEntries(input: NewMangaListEntry!): MangaListEntries!
+  addAnimeListEntries(input: NewAnimeListEntry!): AnimeListEntries!
 }
+
+
