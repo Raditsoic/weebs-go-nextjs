@@ -78,6 +78,28 @@ func (r *mutationResolver) SaveReview(ctx context.Context, input model.NewReview
 	return r.ReviewService.SaveReview(input, userID)
 }
 
+// AddMangaListEntries is the resolver for the addMangaListEntries field.
+func (r *mutationResolver) AddMangaListEntries(ctx context.Context, input model.NewMangaListEntry) (*model.MangaListEntries, error) {
+	claims := ctx.Value(middleware.UserContextKey)
+	if claims == nil {
+		return nil, fmt.Errorf("Unauthorized.")
+	}
+
+	userClaims, ok := claims.(*utils.Claims)
+	if !ok {
+		return nil, fmt.Errorf("Invalid token.")
+	}
+
+	userID := userClaims.ID
+
+	return r.MangaService.AddMangatoMangaList(userID, input)
+}
+
+// AddAnimeListEntries is the resolver for the addAnimeListEntries field.
+func (r *mutationResolver) AddAnimeListEntries(ctx context.Context, input model.NewAnimeListEntry) (*model.AnimeListEntries, error) {
+	panic(fmt.Errorf("not implemented: AddAnimeListEntries - addAnimeListEntries"))
+}
+
 // Animes is the resolver for the animes field.
 func (r *queryResolver) Animes(ctx context.Context) ([]*model.Anime, error) {
 	claims := ctx.Value(middleware.UserContextKey)
@@ -116,6 +138,16 @@ func (r *queryResolver) OneManga(ctx context.Context, id string) (*model.Manga, 
 	}
 
 	return r.MangaService.GetMangaByID(id)
+}
+
+// AnimeList is the resolver for the animeList field.
+func (r *queryResolver) AnimeList(ctx context.Context, userID string) (*model.AnimeList, error) {
+	panic(fmt.Errorf("not implemented: AnimeList - animeList"))
+}
+
+// MangaList is the resolver for the mangaList field.
+func (r *queryResolver) MangaList(ctx context.Context, userID string) (*model.MangaList, error) {
+	panic(fmt.Errorf("not implemented: MangaList - mangaList"))
 }
 
 // Genres is the resolver for the genres field.

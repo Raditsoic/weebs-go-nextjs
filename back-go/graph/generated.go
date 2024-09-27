@@ -55,6 +55,18 @@ type ComplexityRoot struct {
 		Title       func(childComplexity int) int
 	}
 
+	AnimeList struct {
+		Entries func(childComplexity int) int
+		ID      func(childComplexity int) int
+		UserID  func(childComplexity int) int
+	}
+
+	AnimeListEntries struct {
+		Anime  func(childComplexity int) int
+		ID     func(childComplexity int) int
+		Status func(childComplexity int) int
+	}
+
 	AuthPayload struct {
 		Token func(childComplexity int) int
 	}
@@ -72,21 +84,37 @@ type ComplexityRoot struct {
 		Title       func(childComplexity int) int
 	}
 
+	MangaList struct {
+		Entries func(childComplexity int) int
+		ID      func(childComplexity int) int
+		UserID  func(childComplexity int) int
+	}
+
+	MangaListEntries struct {
+		ID     func(childComplexity int) int
+		Manga  func(childComplexity int) int
+		Status func(childComplexity int) int
+	}
+
 	Mutation struct {
-		CreateAnime func(childComplexity int, input model.NewAnime) int
-		CreateManga func(childComplexity int, input model.NewManga) int
-		Login       func(childComplexity int, input model.LoginUser) int
-		Register    func(childComplexity int, input model.RegisterUser) int
-		SaveReview  func(childComplexity int, input model.NewReview) int
+		AddAnimeListEntries func(childComplexity int, input model.NewAnimeListEntry) int
+		AddMangaListEntries func(childComplexity int, input model.NewMangaListEntry) int
+		CreateAnime         func(childComplexity int, input model.NewAnime) int
+		CreateManga         func(childComplexity int, input model.NewManga) int
+		Login               func(childComplexity int, input model.LoginUser) int
+		Register            func(childComplexity int, input model.RegisterUser) int
+		SaveReview          func(childComplexity int, input model.NewReview) int
 	}
 
 	Query struct {
-		Animes   func(childComplexity int) int
-		Genres   func(childComplexity int) int
-		Mangas   func(childComplexity int) int
-		Me       func(childComplexity int) int
-		OneAnime func(childComplexity int, id string) int
-		OneManga func(childComplexity int, id string) int
+		AnimeList func(childComplexity int, userID string) int
+		Animes    func(childComplexity int) int
+		Genres    func(childComplexity int) int
+		MangaList func(childComplexity int, userID string) int
+		Mangas    func(childComplexity int) int
+		Me        func(childComplexity int) int
+		OneAnime  func(childComplexity int, id string) int
+		OneManga  func(childComplexity int, id string) int
 	}
 
 	Review struct {
@@ -114,12 +142,16 @@ type MutationResolver interface {
 	Register(ctx context.Context, input model.RegisterUser) (*model.AuthPayload, error)
 	Login(ctx context.Context, input model.LoginUser) (*model.AuthPayload, error)
 	SaveReview(ctx context.Context, input model.NewReview) (*model.Review, error)
+	AddMangaListEntries(ctx context.Context, input model.NewMangaListEntry) (*model.MangaListEntries, error)
+	AddAnimeListEntries(ctx context.Context, input model.NewAnimeListEntry) (*model.AnimeListEntries, error)
 }
 type QueryResolver interface {
 	Animes(ctx context.Context) ([]*model.Anime, error)
 	Mangas(ctx context.Context) ([]*model.Manga, error)
 	OneAnime(ctx context.Context, id string) (*model.Anime, error)
 	OneManga(ctx context.Context, id string) (*model.Manga, error)
+	AnimeList(ctx context.Context, userID string) (*model.AnimeList, error)
+	MangaList(ctx context.Context, userID string) (*model.MangaList, error)
 	Genres(ctx context.Context) ([]*model.Genre, error)
 	Me(ctx context.Context) (*model.User, error)
 }
@@ -178,6 +210,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Anime.Title(childComplexity), true
 
+	case "AnimeList.entries":
+		if e.complexity.AnimeList.Entries == nil {
+			break
+		}
+
+		return e.complexity.AnimeList.Entries(childComplexity), true
+
+	case "AnimeList.id":
+		if e.complexity.AnimeList.ID == nil {
+			break
+		}
+
+		return e.complexity.AnimeList.ID(childComplexity), true
+
+	case "AnimeList.userID":
+		if e.complexity.AnimeList.UserID == nil {
+			break
+		}
+
+		return e.complexity.AnimeList.UserID(childComplexity), true
+
+	case "AnimeListEntries.anime":
+		if e.complexity.AnimeListEntries.Anime == nil {
+			break
+		}
+
+		return e.complexity.AnimeListEntries.Anime(childComplexity), true
+
+	case "AnimeListEntries.id":
+		if e.complexity.AnimeListEntries.ID == nil {
+			break
+		}
+
+		return e.complexity.AnimeListEntries.ID(childComplexity), true
+
+	case "AnimeListEntries.status":
+		if e.complexity.AnimeListEntries.Status == nil {
+			break
+		}
+
+		return e.complexity.AnimeListEntries.Status(childComplexity), true
+
 	case "AuthPayload.token":
 		if e.complexity.AuthPayload.Token == nil {
 			break
@@ -233,6 +307,72 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Manga.Title(childComplexity), true
+
+	case "MangaList.entries":
+		if e.complexity.MangaList.Entries == nil {
+			break
+		}
+
+		return e.complexity.MangaList.Entries(childComplexity), true
+
+	case "MangaList.id":
+		if e.complexity.MangaList.ID == nil {
+			break
+		}
+
+		return e.complexity.MangaList.ID(childComplexity), true
+
+	case "MangaList.userID":
+		if e.complexity.MangaList.UserID == nil {
+			break
+		}
+
+		return e.complexity.MangaList.UserID(childComplexity), true
+
+	case "MangaListEntries.id":
+		if e.complexity.MangaListEntries.ID == nil {
+			break
+		}
+
+		return e.complexity.MangaListEntries.ID(childComplexity), true
+
+	case "MangaListEntries.manga":
+		if e.complexity.MangaListEntries.Manga == nil {
+			break
+		}
+
+		return e.complexity.MangaListEntries.Manga(childComplexity), true
+
+	case "MangaListEntries.status":
+		if e.complexity.MangaListEntries.Status == nil {
+			break
+		}
+
+		return e.complexity.MangaListEntries.Status(childComplexity), true
+
+	case "Mutation.addAnimeListEntries":
+		if e.complexity.Mutation.AddAnimeListEntries == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addAnimeListEntries_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddAnimeListEntries(childComplexity, args["input"].(model.NewAnimeListEntry)), true
+
+	case "Mutation.addMangaListEntries":
+		if e.complexity.Mutation.AddMangaListEntries == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addMangaListEntries_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddMangaListEntries(childComplexity, args["input"].(model.NewMangaListEntry)), true
 
 	case "Mutation.createAnime":
 		if e.complexity.Mutation.CreateAnime == nil {
@@ -294,6 +434,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.SaveReview(childComplexity, args["input"].(model.NewReview)), true
 
+	case "Query.animeList":
+		if e.complexity.Query.AnimeList == nil {
+			break
+		}
+
+		args, err := ec.field_Query_animeList_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AnimeList(childComplexity, args["userID"].(string)), true
+
 	case "Query.animes":
 		if e.complexity.Query.Animes == nil {
 			break
@@ -307,6 +459,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Genres(childComplexity), true
+
+	case "Query.mangaList":
+		if e.complexity.Query.MangaList == nil {
+			break
+		}
+
+		args, err := ec.field_Query_mangaList_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MangaList(childComplexity, args["userID"].(string)), true
 
 	case "Query.mangas":
 		if e.complexity.Query.Mangas == nil {
@@ -440,7 +604,9 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputLoginUser,
 		ec.unmarshalInputNewAnime,
+		ec.unmarshalInputNewAnimeListEntry,
 		ec.unmarshalInputNewManga,
+		ec.unmarshalInputNewMangaListEntry,
 		ec.unmarshalInputNewReview,
 		ec.unmarshalInputRegisterUser,
 	)
@@ -558,6 +724,70 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_addAnimeListEntries_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Mutation_addAnimeListEntries_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_addAnimeListEntries_argsInput(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (model.NewAnimeListEntry, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["input"]
+	if !ok {
+		var zeroVal model.NewAnimeListEntry
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNNewAnimeListEntry2githubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐNewAnimeListEntry(ctx, tmp)
+	}
+
+	var zeroVal model.NewAnimeListEntry
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_addMangaListEntries_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Mutation_addMangaListEntries_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_addMangaListEntries_argsInput(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (model.NewMangaListEntry, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["input"]
+	if !ok {
+		var zeroVal model.NewMangaListEntry
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNNewMangaListEntry2githubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐNewMangaListEntry(ctx, tmp)
+	}
+
+	var zeroVal model.NewMangaListEntry
+	return zeroVal, nil
+}
 
 func (ec *executionContext) field_Mutation_createAnime_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -745,6 +975,70 @@ func (ec *executionContext) field_Query___type_argsName(
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 	if tmp, ok := rawArgs["name"]; ok {
 		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_animeList_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Query_animeList_argsUserID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["userID"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_animeList_argsUserID(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (string, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["userID"]
+	if !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
+	if tmp, ok := rawArgs["userID"]; ok {
+		return ec.unmarshalNID2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_mangaList_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Query_mangaList_argsUserID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["userID"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_mangaList_argsUserID(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (string, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["userID"]
+	if !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
+	if tmp, ok := rawArgs["userID"]; ok {
+		return ec.unmarshalNID2string(ctx, tmp)
 	}
 
 	var zeroVal string
@@ -1113,6 +1407,290 @@ func (ec *executionContext) fieldContext_Anime_genre(_ context.Context, field gr
 	return fc, nil
 }
 
+func (ec *executionContext) _AnimeList_id(ctx context.Context, field graphql.CollectedField, obj *model.AnimeList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnimeList_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnimeList_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnimeList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AnimeList_userID(ctx context.Context, field graphql.CollectedField, obj *model.AnimeList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnimeList_userID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnimeList_userID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnimeList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AnimeList_entries(ctx context.Context, field graphql.CollectedField, obj *model.AnimeList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnimeList_entries(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Entries, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.AnimeListEntries)
+	fc.Result = res
+	return ec.marshalNAnimeListEntries2ᚕᚖgithubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐAnimeListEntriesᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnimeList_entries(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnimeList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AnimeListEntries_id(ctx, field)
+			case "status":
+				return ec.fieldContext_AnimeListEntries_status(ctx, field)
+			case "anime":
+				return ec.fieldContext_AnimeListEntries_anime(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AnimeListEntries", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AnimeListEntries_id(ctx context.Context, field graphql.CollectedField, obj *model.AnimeListEntries) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnimeListEntries_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnimeListEntries_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnimeListEntries",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AnimeListEntries_status(ctx context.Context, field graphql.CollectedField, obj *model.AnimeListEntries) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnimeListEntries_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.Status)
+	fc.Result = res
+	return ec.marshalNStatus2githubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnimeListEntries_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnimeListEntries",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Status does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AnimeListEntries_anime(ctx context.Context, field graphql.CollectedField, obj *model.AnimeListEntries) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AnimeListEntries_anime(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Anime, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Anime)
+	fc.Result = res
+	return ec.marshalNAnime2ᚖgithubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐAnime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AnimeListEntries_anime(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AnimeListEntries",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Anime_id(ctx, field)
+			case "title":
+				return ec.fieldContext_Anime_title(ctx, field)
+			case "image":
+				return ec.fieldContext_Anime_image(ctx, field)
+			case "description":
+				return ec.fieldContext_Anime_description(ctx, field)
+			case "genre":
+				return ec.fieldContext_Anime_genre(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Anime", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _AuthPayload_token(ctx context.Context, field graphql.CollectedField, obj *model.AuthPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_AuthPayload_token(ctx, field)
 	if err != nil {
@@ -1471,6 +2049,290 @@ func (ec *executionContext) fieldContext_Manga_genre(_ context.Context, field gr
 	return fc, nil
 }
 
+func (ec *executionContext) _MangaList_id(ctx context.Context, field graphql.CollectedField, obj *model.MangaList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MangaList_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MangaList_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MangaList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MangaList_userID(ctx context.Context, field graphql.CollectedField, obj *model.MangaList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MangaList_userID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MangaList_userID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MangaList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MangaList_entries(ctx context.Context, field graphql.CollectedField, obj *model.MangaList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MangaList_entries(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Entries, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.MangaListEntries)
+	fc.Result = res
+	return ec.marshalNMangaListEntries2ᚕᚖgithubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐMangaListEntriesᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MangaList_entries(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MangaList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MangaListEntries_id(ctx, field)
+			case "status":
+				return ec.fieldContext_MangaListEntries_status(ctx, field)
+			case "manga":
+				return ec.fieldContext_MangaListEntries_manga(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MangaListEntries", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MangaListEntries_id(ctx context.Context, field graphql.CollectedField, obj *model.MangaListEntries) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MangaListEntries_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MangaListEntries_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MangaListEntries",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MangaListEntries_status(ctx context.Context, field graphql.CollectedField, obj *model.MangaListEntries) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MangaListEntries_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.Status)
+	fc.Result = res
+	return ec.marshalNStatus2githubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MangaListEntries_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MangaListEntries",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Status does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MangaListEntries_manga(ctx context.Context, field graphql.CollectedField, obj *model.MangaListEntries) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MangaListEntries_manga(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Manga, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Manga)
+	fc.Result = res
+	return ec.marshalNManga2ᚖgithubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐManga(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MangaListEntries_manga(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MangaListEntries",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Manga_id(ctx, field)
+			case "title":
+				return ec.fieldContext_Manga_title(ctx, field)
+			case "image":
+				return ec.fieldContext_Manga_image(ctx, field)
+			case "description":
+				return ec.fieldContext_Manga_description(ctx, field)
+			case "genre":
+				return ec.fieldContext_Manga_genre(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Manga", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createAnime(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createAnime(ctx, field)
 	if err != nil {
@@ -1794,6 +2656,132 @@ func (ec *executionContext) fieldContext_Mutation_saveReview(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_addMangaListEntries(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addMangaListEntries(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddMangaListEntries(rctx, fc.Args["input"].(model.NewMangaListEntry))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.MangaListEntries)
+	fc.Result = res
+	return ec.marshalNMangaListEntries2ᚖgithubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐMangaListEntries(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addMangaListEntries(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MangaListEntries_id(ctx, field)
+			case "status":
+				return ec.fieldContext_MangaListEntries_status(ctx, field)
+			case "manga":
+				return ec.fieldContext_MangaListEntries_manga(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MangaListEntries", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addMangaListEntries_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_addAnimeListEntries(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addAnimeListEntries(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddAnimeListEntries(rctx, fc.Args["input"].(model.NewAnimeListEntry))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.AnimeListEntries)
+	fc.Result = res
+	return ec.marshalNAnimeListEntries2ᚖgithubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐAnimeListEntries(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addAnimeListEntries(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AnimeListEntries_id(ctx, field)
+			case "status":
+				return ec.fieldContext_AnimeListEntries_status(ctx, field)
+			case "anime":
+				return ec.fieldContext_AnimeListEntries_anime(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AnimeListEntries", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addAnimeListEntries_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_animes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_animes(ctx, field)
 	if err != nil {
@@ -2034,6 +3022,132 @@ func (ec *executionContext) fieldContext_Query_oneManga(ctx context.Context, fie
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_oneManga_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_animeList(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_animeList(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AnimeList(rctx, fc.Args["userID"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.AnimeList)
+	fc.Result = res
+	return ec.marshalNAnimeList2ᚖgithubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐAnimeList(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_animeList(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AnimeList_id(ctx, field)
+			case "userID":
+				return ec.fieldContext_AnimeList_userID(ctx, field)
+			case "entries":
+				return ec.fieldContext_AnimeList_entries(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AnimeList", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_animeList_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_mangaList(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_mangaList(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().MangaList(rctx, fc.Args["userID"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.MangaList)
+	fc.Result = res
+	return ec.marshalNMangaList2ᚖgithubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐMangaList(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_mangaList(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MangaList_id(ctx, field)
+			case "userID":
+				return ec.fieldContext_MangaList_userID(ctx, field)
+			case "entries":
+				return ec.fieldContext_MangaList_entries(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MangaList", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_mangaList_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -4658,6 +5772,40 @@ func (ec *executionContext) unmarshalInputNewAnime(ctx context.Context, obj inte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewAnimeListEntry(ctx context.Context, obj interface{}) (model.NewAnimeListEntry, error) {
+	var it model.NewAnimeListEntry
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"status", "contentID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "status":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			data, err := ec.unmarshalNStatus2githubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Status = data
+		case "contentID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentID"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContentID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewManga(ctx context.Context, obj interface{}) (model.NewManga, error) {
 	var it model.NewManga
 	asMap := map[string]interface{}{}
@@ -4700,6 +5848,40 @@ func (ec *executionContext) unmarshalInputNewManga(ctx context.Context, obj inte
 				return it, err
 			}
 			it.GenreID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewMangaListEntry(ctx context.Context, obj interface{}) (model.NewMangaListEntry, error) {
+	var it model.NewMangaListEntry
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"status", "contentID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "status":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			data, err := ec.unmarshalNStatus2githubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Status = data
+		case "contentID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentID"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContentID = data
 		}
 	}
 
@@ -4822,6 +6004,52 @@ func (ec *executionContext) _Content(ctx context.Context, sel ast.SelectionSet, 
 	}
 }
 
+func (ec *executionContext) _List(ctx context.Context, sel ast.SelectionSet, obj model.List) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case model.AnimeList:
+		return ec._AnimeList(ctx, sel, &obj)
+	case *model.AnimeList:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._AnimeList(ctx, sel, obj)
+	case model.MangaList:
+		return ec._MangaList(ctx, sel, &obj)
+	case *model.MangaList:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._MangaList(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _ListEntries(ctx context.Context, sel ast.SelectionSet, obj model.ListEntries) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case model.AnimeListEntries:
+		return ec._AnimeListEntries(ctx, sel, &obj)
+	case *model.AnimeListEntries:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._AnimeListEntries(ctx, sel, obj)
+	case model.MangaListEntries:
+		return ec._MangaListEntries(ctx, sel, &obj)
+	case *model.MangaListEntries:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._MangaListEntries(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
@@ -4859,6 +6087,104 @@ func (ec *executionContext) _Anime(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "genre":
 			out.Values[i] = ec._Anime_genre(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var animeListImplementors = []string{"AnimeList", "List"}
+
+func (ec *executionContext) _AnimeList(ctx context.Context, sel ast.SelectionSet, obj *model.AnimeList) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, animeListImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AnimeList")
+		case "id":
+			out.Values[i] = ec._AnimeList_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "userID":
+			out.Values[i] = ec._AnimeList_userID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "entries":
+			out.Values[i] = ec._AnimeList_entries(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var animeListEntriesImplementors = []string{"AnimeListEntries", "ListEntries"}
+
+func (ec *executionContext) _AnimeListEntries(ctx context.Context, sel ast.SelectionSet, obj *model.AnimeListEntries) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, animeListEntriesImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AnimeListEntries")
+		case "id":
+			out.Values[i] = ec._AnimeListEntries_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "status":
+			out.Values[i] = ec._AnimeListEntries_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "anime":
+			out.Values[i] = ec._AnimeListEntries_anime(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -5027,6 +6353,104 @@ func (ec *executionContext) _Manga(ctx context.Context, sel ast.SelectionSet, ob
 	return out
 }
 
+var mangaListImplementors = []string{"MangaList", "List"}
+
+func (ec *executionContext) _MangaList(ctx context.Context, sel ast.SelectionSet, obj *model.MangaList) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mangaListImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MangaList")
+		case "id":
+			out.Values[i] = ec._MangaList_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "userID":
+			out.Values[i] = ec._MangaList_userID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "entries":
+			out.Values[i] = ec._MangaList_entries(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var mangaListEntriesImplementors = []string{"MangaListEntries", "ListEntries"}
+
+func (ec *executionContext) _MangaListEntries(ctx context.Context, sel ast.SelectionSet, obj *model.MangaListEntries) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mangaListEntriesImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MangaListEntries")
+		case "id":
+			out.Values[i] = ec._MangaListEntries_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "status":
+			out.Values[i] = ec._MangaListEntries_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "manga":
+			out.Values[i] = ec._MangaListEntries_manga(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -5077,6 +6501,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "saveReview":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_saveReview(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "addMangaListEntries":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addMangaListEntries(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "addAnimeListEntries":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addAnimeListEntries(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -5199,6 +6637,50 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_oneManga(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "animeList":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_animeList(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "mangaList":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_mangaList(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -5798,6 +7280,78 @@ func (ec *executionContext) marshalNAnime2ᚖgithubᚗcomᚋRaditsoicᚋanimeᚑ
 	return ec._Anime(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNAnimeList2githubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐAnimeList(ctx context.Context, sel ast.SelectionSet, v model.AnimeList) graphql.Marshaler {
+	return ec._AnimeList(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAnimeList2ᚖgithubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐAnimeList(ctx context.Context, sel ast.SelectionSet, v *model.AnimeList) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AnimeList(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNAnimeListEntries2githubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐAnimeListEntries(ctx context.Context, sel ast.SelectionSet, v model.AnimeListEntries) graphql.Marshaler {
+	return ec._AnimeListEntries(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAnimeListEntries2ᚕᚖgithubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐAnimeListEntriesᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.AnimeListEntries) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAnimeListEntries2ᚖgithubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐAnimeListEntries(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNAnimeListEntries2ᚖgithubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐAnimeListEntries(ctx context.Context, sel ast.SelectionSet, v *model.AnimeListEntries) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AnimeListEntries(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNAuthPayload2githubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐAuthPayload(ctx context.Context, sel ast.SelectionSet, v model.AuthPayload) graphql.Marshaler {
 	return ec._AuthPayload(ctx, sel, &v)
 }
@@ -5999,13 +7553,95 @@ func (ec *executionContext) marshalNManga2ᚖgithubᚗcomᚋRaditsoicᚋanimeᚑ
 	return ec._Manga(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNMangaList2githubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐMangaList(ctx context.Context, sel ast.SelectionSet, v model.MangaList) graphql.Marshaler {
+	return ec._MangaList(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNMangaList2ᚖgithubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐMangaList(ctx context.Context, sel ast.SelectionSet, v *model.MangaList) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MangaList(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMangaListEntries2githubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐMangaListEntries(ctx context.Context, sel ast.SelectionSet, v model.MangaListEntries) graphql.Marshaler {
+	return ec._MangaListEntries(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNMangaListEntries2ᚕᚖgithubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐMangaListEntriesᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.MangaListEntries) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNMangaListEntries2ᚖgithubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐMangaListEntries(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNMangaListEntries2ᚖgithubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐMangaListEntries(ctx context.Context, sel ast.SelectionSet, v *model.MangaListEntries) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MangaListEntries(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNNewAnime2githubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐNewAnime(ctx context.Context, v interface{}) (model.NewAnime, error) {
 	res, err := ec.unmarshalInputNewAnime(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNNewAnimeListEntry2githubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐNewAnimeListEntry(ctx context.Context, v interface{}) (model.NewAnimeListEntry, error) {
+	res, err := ec.unmarshalInputNewAnimeListEntry(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNNewManga2githubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐNewManga(ctx context.Context, v interface{}) (model.NewManga, error) {
 	res, err := ec.unmarshalInputNewManga(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNNewMangaListEntry2githubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐNewMangaListEntry(ctx context.Context, v interface{}) (model.NewMangaListEntry, error) {
+	res, err := ec.unmarshalInputNewMangaListEntry(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -6031,6 +7667,16 @@ func (ec *executionContext) marshalNReview2ᚖgithubᚗcomᚋRaditsoicᚋanime�
 		return graphql.Null
 	}
 	return ec._Review(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNStatus2githubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐStatus(ctx context.Context, v interface{}) (model.Status, error) {
+	var res model.Status
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNStatus2githubᚗcomᚋRaditsoicᚋanimeᚑgoᚋgraphᚋmodelᚐStatus(ctx context.Context, sel ast.SelectionSet, v model.Status) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

@@ -26,19 +26,21 @@ func main() {
 	client := database.Connect()
 
 	animeRepo := repository.NewAnimeRepo(client)
+	animeListRepo := repository.NewAnimeListRepo(client)
 	mangaRepo := repository.NewMangaRepo(client)
+	mangaListRepo := repository.NewMangaListRepo(client)
 	userRepo := repository.NewUserRepo(client)
 	reviewRepo := repository.NewReviewRepo(client)
 
-	animeService := service.NewAnimeService(*animeRepo)
-	mangaService := service.NewMangaService(*mangaRepo)
+	animeService := service.NewAnimeService(*animeRepo, *animeListRepo)
+	mangaService := service.NewMangaService(*mangaRepo, *mangaListRepo)
 	userService := service.NewUserService(*userRepo)
 	reviewService := service.NewReviewService(*reviewRepo, *animeRepo, *mangaRepo)
 
 	resolver := &graph.Resolver{
-		AnimeService: animeService,
-		MangaService: mangaService,
-		UserService: userService,
+		AnimeService:  animeService,
+		MangaService:  mangaService,
+		UserService:   userService,
 		ReviewService: reviewService,
 	}
 
